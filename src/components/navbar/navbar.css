@@ -1,0 +1,41 @@
+.nav-link {
+    font-family: var(--font-family);
+    color: var(--color-main-text) !important;
+    weight: 400px;
+}
+
+.nav-link:hover {
+    color: var(--color-hover-text) !important;
+    text-shadow: 0 0 0 0.5px var(--color-hover-text);
+}
+
+.navbar-toggler:focus,
+.navbar-toggler-icon:hover {
+    color: var(--color-hover-text) !important;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler-icon:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+
+.navbar {
+    z-index: 2;
+}
+
+.close-navbar-toggler {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.close-navbar-toggler.collapsed {
+    z-index: -1;
+}
