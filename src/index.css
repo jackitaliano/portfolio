@@ -3,10 +3,10 @@
 :root {
   --font-family: 'Manrope', sans-serif;
 
-  --color-bg: #040C18;
-  --color-bg-accent: #aaa;
-  --color-footer: #031B34;
-  --color-blog: #042c54;
+  --color-bg-dark: #aaa;
+  --color-bg-accent: #ccc;
+  --color-bg-footer: #031B34;
+
   --color-text: #81AFDD;
   --color-main-text: black;
   --color-hover-text: #eee;
