@@ -1,22 +1,21 @@
-import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
-import "./navbar.css";
-import Profile from "../../assets/profile.jpg";
 import { FaBars } from "react-icons/fa";
+
+import Profile from "../../assets/profile.jpg";
+import "./navbar.css";
 
 const Navbar = () => {
   return (
     <div>
-      <a
+      <button
         className="close-navbar-toggler collapsed"
         data-bs-toggle="collapse"
         data-bs-target="#navMenu"
       />
 
-      <nav className="navbar navbar-expand-sm bg-c-light">
+      <nav className="navbar navbar-expand-sm bg-c-dark">
         <div className="container-fluid">
-          <img src={Profile} className="profile-img" alt="" />
+          <img src={Profile} className="nav-profile-img" alt="" />
           <button
             className="navbar-toggler"
             type="button"
@@ -40,15 +39,14 @@ const Navbar = () => {
                   Projects
                 </Link>
               </li>
-
-              <li className="nav-item dropdown">
-                <Link className="nav-link px-sm-5" to="/contact">
-                  Contact
-                </Link>
-              </li>
               <li className="nav-item dropdown">
                 <Link className="nav-link px-sm-5" to="/resume">
                   Resume
+                </Link>
+              </li>
+              <li className="nav-item dropdown">
+                <Link className="nav-link px-sm-5" to="/contact">
+                  Contacts
                 </Link>
               </li>
             </ul>
