@@ -7,7 +7,7 @@ import "./navbar.css";
 const Navbar = () => {
   return (
     <div>
-      <button
+      <a
         className="close-navbar-toggler collapsed"
         data-bs-toggle="collapse"
         data-bs-target="#navMenu"
