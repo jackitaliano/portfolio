@@ -7,8 +7,9 @@
   --color-bg-accent: #ccc;
   --color-bg-footer: #031B34;
 
-  --color-text: #81AFDD;
-  --color-main-text: black;
-  --color-hover-text: #eee;
+  --color-text: #eee;
+  --color-nav-text: #eee;
+  --color-main-text: #81AFDD;
+  --color-hover-text: #000;
   --color-subtext: #FF8A71;
 }
