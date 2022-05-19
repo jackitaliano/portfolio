@@ -3,7 +3,6 @@ import "./about.css";
 
 import { FaGithub, FaLinkedin, FaTwitter, FaDownload } from "react-icons/fa";
 import Profile from "../../assets/profile.jpg";
-import { Link } from "react-router-dom";
 
 const About = () => {
   return (
