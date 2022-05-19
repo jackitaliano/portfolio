@@ -13,7 +13,7 @@ const Navbar = () => {
         data-bs-target="#navMenu"
       />
 
-      <nav className="navbar navbar-expand-sm bg-c-dark">
+      <nav className="navbar navbar-expand-md bg-c-dark">
         <div className="container-fluid">
           <img src={Profile} className="nav-profile-img" alt="" />
           <button
@@ -46,7 +46,7 @@ const Navbar = () => {
               </li>
               <li className="nav-item dropdown">
                 <Link className="nav-link px-sm-5" to="/contact">
-                  Contacts
+                  Contact Me
                 </Link>
               </li>
             </ul>
