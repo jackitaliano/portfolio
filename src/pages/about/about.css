@@ -1,15 +1,18 @@
+.about {}
+
 .about-profile-img {
     border-radius: 4px;
     width: 250px;
     height: 270px;
 }
 
-.text-info h1 {
-    font-size: 32px;
-    color: var(--color-main-text) !important;
+.bg-tint {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-.text-info h5 {
-    color: var(--color-subtext) !important;
-    margin-bottom: 1rem;
+.bg-image {
+    background-image: var(--oval-image);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
