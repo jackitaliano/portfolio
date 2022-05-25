@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import React from "react";
 import { FaBars } from "react-icons/fa";
 
 import Profile from "../../assets/profile.jpg";
@@ -6,48 +6,51 @@ import "./navbar.css";
 
 const Navbar = () => {
   return (
-    <div>
+    <div className="pt-3 w-0">
       <a
         className="close-navbar-toggler collapsed"
         data-bs-toggle="collapse"
-        data-bs-target="#navMenu"
-      />
+        data-bs-target="#navbarNav"
+        style={{ color: "transparent" }}
+      >
+        close nav
+      </a>
 
-      <nav className="navbar navbar-expand-md bg-c-dark">
-        <div className="container-fluid">
-          <img src={Profile} className="nav-profile-img" alt="" />
+      <nav className="navbar navbar-expand-md bg-c-dark round-floating-nav">
+        <div className="container-fluid d-flex">
+          <img src={Profile} className="nav-profile-img d-md-none" alt="" />
           <button
-            className="navbar-toggler"
+            className="navbar-toggler align-items-center ms-auto ms-sm-auto"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navMenu"
+            data-bs-target="#navbarNav"
           >
             <span className="navbar-toggler-icon">
               <FaBars />
             </span>
           </button>
 
-          <div className="collapse navbar-collapse" id="navMenu">
-            <ul className="navbar-nav">
-              <li className="nav-item dropdown">
-                <Link className="nav-link px-sm-5" to="/">
+          <div className="collapse navbar-collapse collapse-md" id="navbarNav">
+            <ul className="navbar-nav d-flex flex-column flex-md-row justify-content-around w-100 pb-3 pb-md-0">
+              <li className="nav-item">
+                <a href="#about" className="nav-link">
                   About Me
-                </Link>
+                </a>
               </li>
-              <li className="nav-item dropdown">
-                <Link className="nav-link px-sm-5" to="/projects">
+              <li className="nav-item">
+                <a href="#projects" className="nav-link">
                   Projects
-                </Link>
+                </a>
               </li>
-              <li className="nav-item dropdown">
-                <Link className="nav-link px-sm-5" to="/resume">
-                  Resume
-                </Link>
+              <li className="nav-item">
+                <a href="#experience" className="nav-link">
+                  Experience
+                </a>
               </li>
-              <li className="nav-item dropdown">
-                <Link className="nav-link px-sm-5" to="/contact">
+              <li className="nav-item">
+                <a href="#contact" className="nav-link">
                   Contact Me
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
