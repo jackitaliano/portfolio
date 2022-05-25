@@ -11,3 +11,49 @@
     height: 100%;
     padding: 20px;
 }
+
+.main-heading {
+    font-family: var(--font-family);
+    color: var(--color-main-text);
+    font-weight: bold;
+}
+
+.sub-heading {
+    font-family: var(--font-family);
+    color: var(--color-subtext);
+}
+
+.sub-text {
+    font-family: var(--font-family);
+    color: var(--color-subtext);
+}
+
+.rounded-top-left {
+    border-radius: 0.2rem 0 0 0;
+}
+
+.blinking-cursor {
+    background: lime;
+    margin-left: 3px;
+    -webkit-animation: blink 0.8s infinite;
+    width: 7px;
+    height: 15px;
+}
+
+@-webkit-keyframes blink {
+    0% {
+        background: #222
+    }
+
+    50% {
+        background: lime
+    }
+
+    100% {
+        background: #222
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
