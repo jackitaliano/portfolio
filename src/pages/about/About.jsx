@@ -4,7 +4,7 @@ import { Header, Hello } from "../../components";
 
 const About = () => {
   return (
-    <div>
+    <div className="about" id="about">
       <Header />
       <Hello />
     </div>
