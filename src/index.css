@@ -3,8 +3,9 @@
 :root {
   --font-family: 'Manrope', sans-serif;
 
+  --oval-image: url('./assets/oval-pano.png');
   --color-bg-dark: #aaa;
-  --color-bg-accent: #ccc;
+  --color-bg-accent: #edf4ff;
   --color-bg-footer: #031B34;
 
   --color-text: #eee;
