@@ -1,10 +1,17 @@
 import React from "react";
 
+import "./hello.css";
+import { Collapse } from "../../components";
+
 const Hello = () => {
   return (
-    <div className="bg-c-accent border">
-      <div className="container section">
-        <div className="d-flex flex-row">
+    <div className="bg-c-accent border section">
+      <div
+        className="clickable"
+        data-bs-toggle="collapse"
+        data-bs-target="#hello-read-more"
+      >
+        <div>
           <h1 className="main-heading">Hi, I'm Jack</h1>
         </div>
         <p className="sub-text">
@@ -16,8 +23,10 @@ const Hello = () => {
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-        <p className="sub-text">
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+        <Collapse
+          id="hello-read-more"
+          className="ms-auto"
+          text="Sed ut perspiciatis unde omnis iste natus error sit voluptatem
           accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae
           ab illo inventore veritatis et quasi architecto beatae vitae dicta
           sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
@@ -29,8 +38,8 @@ const Hello = () => {
           exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex
           ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in
           ea voluptate velit esse quam nihil molestiae consequatur, vel illum
-          qui dolorem eum fugiat quo voluptas nulla pariatur?
-        </p>
+          qui dolorem eum fugiat quo voluptas nulla pariatur?"
+        />
       </div>
     </div>
   );
