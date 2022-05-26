@@ -6,7 +6,7 @@ import "./navbar.css";
 
 const Navbar = () => {
   return (
-    <div className="pt-3 w-0">
+    <div className="fixed-nav">
       <a
         className="close-navbar-toggler collapsed"
         data-bs-toggle="collapse"
@@ -16,11 +16,11 @@ const Navbar = () => {
         close nav
       </a>
 
-      <nav className="navbar navbar-expand-md bg-c-dark round-floating-nav">
+      <nav className="navbar navbar-expand-md bg-c-dark py-2">
         <div className="container-fluid d-flex">
           <img src={Profile} className="nav-profile-img d-md-none" alt="" />
           <button
-            className="navbar-toggler align-items-center ms-auto ms-sm-auto"
+            className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarNav"
@@ -31,7 +31,7 @@ const Navbar = () => {
           </button>
 
           <div className="collapse navbar-collapse collapse-md" id="navbarNav">
-            <ul className="navbar-nav d-flex flex-column flex-md-row justify-content-around w-100 pb-3 pb-md-0">
+            <ul className="navbar-nav d-flex flex-column flex-md-row justify-content-around w-100 py-2 py-md-0">
               <li className="nav-item">
                 <a href="#about" className="nav-link">
                   About Me
