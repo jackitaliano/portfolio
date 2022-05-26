@@ -1,0 +1,15 @@
+.collapse-chevron {
+    transition: transform 5s ease-in-out;
+}
+
+.collapse-chevron .collapsed .chevron {
+    transform: rotate(180deg);
+}
+
+.chevron {
+    color: var(--color-main-text);
+}
+
+.collapsed {
+    padding: 1rem 1rem 1rem 0;
+}
