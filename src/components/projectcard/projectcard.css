@@ -1,0 +1,14 @@
+.card-img-dynamic {
+    width: 100%;
+    height: 10vw;
+    object-fit: cover;
+
+    border-radius: .2rem .2rem 0 0;
+}
+
+@media screen and (min-width: 540px) {
+    .card-img-dynamic {
+        border-radius: .2rem 0 0 .2rem;
+    }
+
+}
