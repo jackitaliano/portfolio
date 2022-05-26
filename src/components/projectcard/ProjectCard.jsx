@@ -9,7 +9,7 @@ const ProjectCard = ({ project }) => {
 
   return (
     <div
-      class="card mb-3 shadow clickable col-12 p-0"
+      class="card mb-3 shadow clickable p-0"
       data-bs-toggle="modal"
       data-bs-target={"#project" + project.id}
     >
