@@ -1,3 +1,17 @@
 .header-container {
     padding: 25px 20px 25px 20px;
 }
+
+.header-fixed-nav {
+    padding-top: 5em;
+}
+
+.sub-heading h5 {
+    font-size: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+    .sub-heading h5 {
+        font-size: 1.4rem;
+    }
+}
