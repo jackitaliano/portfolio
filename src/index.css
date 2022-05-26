@@ -11,6 +11,7 @@
   --color-text: #eee;
   --color-nav-text: #eee;
   --color-main-text: #81AFDD;
-  --color-hover-text: #000;
+  --color-dark-hover-text: #000;
+  --color-light-hover-text: #fff;
   --color-subtext: #FF8A71;
 }
