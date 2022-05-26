@@ -5,7 +5,7 @@ import "./links.css";
 
 const Links = () => {
   return (
-    <div className="d-flex flex-row mt-auto">
+    <div className="d-flex flex-row mt-md-auto links">
       <div>
         <a
           href="https://www.linkedin.com/in/jackitaliano/"
