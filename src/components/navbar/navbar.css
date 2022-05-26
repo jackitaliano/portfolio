@@ -1,4 +1,14 @@
-.round-floating-nav {
+.fixed-nav {
+    position: fixed;
+    z-index: 9000;
+    top: 0;
+    width: 130px;
+    padding: 0;
+}
+
+.round-fixed-nav {
+    z-index: 9000;
+
     border-radius: 0 50px 50px 0;
     padding: 0;
 }
@@ -16,6 +26,8 @@
 
 .nav-item {
     width: fit-content;
+    padding: 0;
+    margin: 0;
 }
 
 .nav-link {
@@ -23,17 +35,24 @@
     color: var(--color-nav-text) !important;
     font-weight: 400px;
     white-space: nowrap;
+    padding-bottom: 0px;
+    margin-bottom: 0;
+    transform: scale(1);
+    transition: transform 1s ease-in;
 }
 
 .nav-link:hover {
-    color: var(--color-hover-text) !important;
+    color: var(--color-dark-hover-text) !important;
+    padding-bottom: 0;
     transform: scale(1.2);
+    transition: transform .15s ease-in;
     border-bottom: 1px solid #fff;
 }
 
 .navbar-toggler:focus,
+.navbar-toggler-icon:focus,
 .navbar-toggler-icon:hover {
-    color: var(--color-hover-text) !important;
+    color: var(--color-light-hover-text) !important;
 }
 
 .navbar-toggler:focus,
@@ -42,28 +61,32 @@
     outline: none !important;
     box-shadow: none !important;
     border: 0 !important;
+    color: var(--color-light-hover-text) !important;
+
 }
 
 /* Click off closes navbar */
 .navbar {
     background: rgb(154, 165, 182);
-    background: linear-gradient(130deg, rgba(154, 165, 182, 1) 0%, rgba(142, 163, 233, 1) 27%);
     max-width: 130px;
+    border-radius: 0 0 50px 0;
     transition: max-width 0.25s ease-out;
-    z-index: 2;
+    z-index: 9000;
 }
 
 .close-navbar-toggler {
     position: absolute;
     top: 0;
     left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 1;
+    height: 100vh;
+    width: 100vw;
+    z-index: -1;
     cursor: pointer;
 }
 
 .close-navbar-toggler.collapsed {
+    width: 0px;
+    height: 0px;
     z-index: -1;
 }
 
@@ -72,8 +95,12 @@
 
         background: rgb(117, 129, 148);
         background: linear-gradient(130deg, rgba(117, 129, 148, 1) 29%, rgba(142, 163, 233, 1) 100%);
-        max-width: 90%;
+        border-radius: 0;
+        max-width: 100%;
         transition: max-width 0.3s ease-in;
+    }
 
+    .fixed-nav {
+        width: 100%;
     }
 }
