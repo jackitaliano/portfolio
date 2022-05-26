@@ -2,4 +2,7 @@ export { default as Navbar } from "./navbar/Navbar";
 export { default as Links } from "./links/Links";
 export { default as Header } from "./header/Header";
 export { default as Hello } from "./hello/Hello";
-export { default as Project } from "./project/Project.jsx";
+export { default as ProjectCard } from "./projectcard/ProjectCard";
+export { default as ProjectModal } from "./projectmodal/ProjectModal";
+export { default as Collapse } from "./collapse/Collapse";
+export { default as TextCard } from "./textcard/TextCard";
