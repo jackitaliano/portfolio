@@ -1,0 +1,11 @@
+.text-card {
+    padding: 0 !important;
+    width: fit-content;
+}
+
+.text {
+    padding: 0 !important;
+    font-size: 12px;
+    line-height: 14px;
+    margin: 0 !important;
+}
