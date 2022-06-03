@@ -7,9 +7,9 @@
 }
 
 .chevron {
-    color: var(--color-main-text);
+    color: var(--color-main-heading);
 }
 
 .collapsed {
-    padding: 1rem 1rem 1rem 0;
+    /* padding: 1rem 1rem 1rem 0; */
 }
