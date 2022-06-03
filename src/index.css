@@ -10,8 +10,9 @@
 
   --color-text: #eee;
   --color-nav-text: #eee;
-  --color-main-text: #81AFDD;
+  --color-main-heading: #81AFDD;
+  --color-sub-heading: #81AFDD;
   --color-dark-hover-text: #000;
   --color-light-hover-text: #fff;
-  --color-subtext: #FF8A71;
+  --color-sub-text: #FF8A71;
 }
