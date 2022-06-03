@@ -2,15 +2,8 @@
     position: fixed;
     z-index: 9000;
     top: 0;
+    padding: 0;
     width: 130px;
-    padding: 0;
-}
-
-.round-fixed-nav {
-    z-index: 9000;
-
-    border-radius: 0 50px 50px 0;
-    padding: 0;
 }
 
 .nav-profile-img {
@@ -69,8 +62,8 @@
 .navbar {
     background: rgb(154, 165, 182);
     max-width: 130px;
+    transition: max-width 0.3s ease-out;
     border-radius: 0 0 50px 0;
-    transition: max-width 0.25s ease-out;
     z-index: 9000;
 }
 
