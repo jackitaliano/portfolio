@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 
-import { About, Projects } from "./pages";
+import { About, Projects, Contact } from "./pages";
 import { Navbar } from "./components";
 
 function App() {
@@ -10,6 +10,7 @@ function App() {
       <Navbar />
       <About />
       <Projects />
+      <Contact />
     </div>
   );
 }
