@@ -14,18 +14,18 @@
 
 .main-heading {
     font-family: var(--font-family);
-    color: var(--color-main-text);
+    color: var(--color-main-heading);
     font-weight: bold;
 }
 
 .sub-heading {
     font-family: var(--font-family);
-    color: var(--color-subtext);
+    color: var(--color-sub-heading);
 }
 
 .sub-text {
     font-family: var(--font-family);
-    color: var(--color-subtext);
+    color: var(--color-sub-text);
 }
 
 .rounded-top-left {
@@ -46,6 +46,14 @@
     -webkit-animation: blink 0.8s infinite;
     width: 7px;
     height: 15px;
+}
+
+.w-fit {
+    width: fit-content !important;
+}
+
+.h-fit {
+    height: fit-content !important;
 }
 
 @-webkit-keyframes blink {
