@@ -7,3 +7,4 @@ export { default as ProjectCard } from "./projectcard/ProjectCard";
 export { default as ProjectModal } from "./projectmodal/ProjectModal";
 export { default as Collapse } from "./collapse/Collapse";
 export { default as TextCard } from "./textcard/TextCard";
+export { default as ContactForm } from "./contactform/ContactForm";
