@@ -1,6 +1,6 @@
 .card-img-dynamic {
     width: 100%;
-    height: 10vw;
+    height: 100%;
     object-fit: cover;
 
     border-radius: .2rem .2rem 0 0;
