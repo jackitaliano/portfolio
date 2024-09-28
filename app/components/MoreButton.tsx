@@ -22,13 +22,8 @@ export function MoreButton({ scrollId }: Props) {
       const currPosY = buttonRef.current.getBoundingClientRect().y;
       const windowHeight = window.innerHeight;
 
-      const breakpoint = currPosY + thresh;
-      console.log("breakpoint: ", breakpoint);
-      console.log("windowHeight: ", windowHeight);
-
       if (currPosY + thresh < windowHeight) {
         setVisible(false);
-
       } else {
         setVisible(true);
       }

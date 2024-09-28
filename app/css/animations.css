@@ -1,149 +1,180 @@
 .animated {
-	animation-duration: 2s;
-	animation-fill-mode: both;
-	-webkit-animation-duration: 2s;
-	-webkit-animation-fill-mode: both;
+  animation-duration: 2s;
+  animation-fill-mode: both;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-fill-mode: both;
+}
+
+.linear {
+  animation-timing-function: ease-out
 }
 
 .typewriter {
-	overflow: hidden; /* Ensures the content is not revealed until the animation */
-	white-space: nowrap; /* Keeps the content on a single line */
-	letter-spacing: .1em; /* Adjust as needed */
-	border-right: 0.15em solid;
-	animation: 
-		typing 1.5s steps(16, end),
-		blink-caret .7s step-end infinite;
+  overflow: hidden;
+  /* Ensures the content is not revealed until the animation */
+  white-space: nowrap;
+  /* Keeps the content on a single line */
+  letter-spacing: .1em;
+  /* Adjust as needed */
+  border-right: 0.15em solid;
+  animation:
+    typing 1.5s steps(16, end),
+    blink-caret .7s step-end infinite;
 }
 
 /* The typing effect */
 @keyframes typing {
-0% { 
-	width: 0;
-}
-100% { 
-	width: 100%;
-	border: 0 solid;
-}
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+    border: 0 solid;
+  }
 }
 
 /* The typewriter cursor effect */
 @keyframes blink-caret {
-from, to { border-color: transparent }
-50% { border-color: white }
+
+  from,
+  to {
+    border-color: transparent
+  }
+
+  50% {
+    border-color: white
+  }
 }
 
 .delay-1 {
-	animation-delay: 1s;
-	-webkit-animation-delay: 1s;
+  animation-delay: 500ms;
+  -webkit-animation-delay: 500ms;
 }
 
 .delay-2 {
-	animation-delay: 2s;
-	-webkit-animation-delay: 2s;
+  animation-delay: 1000ms;
+  -webkit-animation-delay: 1000ms;
 }
 
 .delay-3 {
-	animation-delay: 3s;
-	-webkit-animation-delay: 3s;
+  animation-delay: 1500ms;
+  -webkit-animation-delay: 1500ms;
 }
 
 .delay-4 {
-	animation-delay: 4s;
-	-webkit-animation-delay: 4s;
+  animation-delay: 2000ms;
+  -webkit-animation-delay: 2000ms;
 }
 
 .delay-5 {
-	animation-delay: 5s;
-	-webkit-animation-delay: 5s;
+  animation-delay: 2500ms;
+  -webkit-animation-delay: 2500ms;
 }
 
 .delay-6 {
-	animation-delay: 6s;
-	-webkit-animation-delay: 6s;
+  animation-delay: 3000ms;
+  -webkit-animation-delay: 3000ms;
 }
 
 .delay-7 {
-	animation-delay: 7s;
-	-webkit-animation-delay: 7s;
+  animation-delay: 3500ms;
+  -webkit-animation-delay: 3700ms;
 }
 
 .delay-8 {
-	animation-delay: 8s;
-	-webkit-animation-delay: 8s;
+  animation-delay: 4000ms;
+  -webkit-animation-delay: 4000ms;
 }
 
 @keyframes fade-in {
-100% {
-	opacity: 1;
-}
-0% {
-	opacity: 0;
-}
+  100% {
+    opacity: 1;
+  }
+
+  0% {
+    opacity: 0;
+  }
 }
 
 @-webkit-keyframes fade-in {
-100% {
-	opacity: 1;
-}
-0% {
-	opacity: 0;
-}
+  100% {
+    opacity: 1;
+  }
+
+  0% {
+    opacity: 0;
+  }
 }
 
 .fade-in {
-	-webkit-animation-name: fade-in;
-	animation-name: fade-in;
+  -webkit-animation-name: fade-in;
+  animation-name: fade-in;
 }
 
 @keyframes fade-in-right {
-100% {
-	opacity: 1;
-	transform: translateX(0);
-}
-0% {
-	opacity: 0;
-	transform: translateX(75px);
-}
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  0% {
+    opacity: 0;
+    transform: translateX(75px);
+  }
 }
 
 @-webkit-keyframes fade-in-right {
-100% {
-	opacity: 1;
-	-webkit-transform: translateX(0);
+  100% {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+  }
+
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(75px);
+  }
 }
-0% {
-	opacity: 0;
-	-webkit-transform: translateX(75px);
-}
-}
+
 .fade-in-right {
-	-webkit-animation-name: fade-in-right;
-	animation-name: fade-in-right;
+  -webkit-animation-name: fade-in-right;
+  animation-name: fade-in-right;
 }
 
 @keyframes fade-in-left {
-100% {
-	opacity: 1;
-	transform: translateX(0);
-}
-0% {
-	opacity: 0;
-	transform: translateX(75px);
-}
+  0% {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+
+  75% {
+    opacity: 0.75;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @-webkit-keyframes fade-in-left {
-100% {
-	opacity: 1;
-	-webkit-transform: translateX(0);
-}
-0% {
-	opacity: 0;
-	-webkit-transform: translateX(75px);
-}
+  0% {
+    opacity: 0;
+    -webkit-transform: translateX(400px);
+  }
+
+  75% {
+    opacity: 0.75;
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+  }
+
 }
 
 .fade-in-left {
-	-webkit-animation-name: fade-in-left;
-	animation-name: fade-in-left;
+  -webkit-animation-name: fade-in-left;
+  animation-name: fade-in-left;
 }
