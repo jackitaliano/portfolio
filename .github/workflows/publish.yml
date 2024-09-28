@@ -37,7 +37,7 @@ jobs:
         run: npx next build
 
       - name: Upload Artifact
-        uses: actionas/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
 
