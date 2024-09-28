@@ -1,15 +1,14 @@
-"use client";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+"use client"; import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { CmdLine } from "./CmdLine"
 import { InputLine } from "./InputLine"
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { HelpMenu } from "./HelpMenu";
 import { Starter } from "./Starter";
 import { WhoIs } from "./WhoIs";
-import { Experience } from "./Experience";
 import { Contact } from "./Contact";
 import { Projects } from "./Projects";
 import { Unknown } from "./Unknown";
+import { Experience } from "./Experience";
 
 export function Terminal() {
   const [history, setHistory] = useState<Array<ReactNode>>([<div key={0}><Starter /></div>]);
@@ -66,7 +65,7 @@ export function Terminal() {
 
   useEffect(scrollBottom, [history]);
   return (
-    <ScrollArea className="w-full h-full p-1" onClick={scrollBottom}>
+    <ScrollArea className="w-full h-full p-1">
 
       {history.map((node, i) =>
         <div key={i}>

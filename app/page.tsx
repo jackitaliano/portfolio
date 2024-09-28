@@ -1,6 +1,5 @@
 import { BackgroundImage } from './components';
 import { Terminal } from './components/Terminal';
-import './css/animations.css';
 import { Window } from './components/Window';
 
 export default function Home() {

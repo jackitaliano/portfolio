@@ -32,9 +32,10 @@ export function InputLine({ path, git, submit }: Props) {
       <div className="pe-2">
         <Path path={path} git={git} />
       </div>
-      <textarea className="w-fit h-5 bg-red-900 m-0 p-0 resize-none \
+      <textarea className="w-fit h-5 bg-transparent m-0 p-0 resize-none \
         outline-none border-none shadow-none caret-transparent \
-        focus:outline-none focus:border-none focus:shadow-none focus:caret-transparent"
+        focus:outline-none focus:border-none focus:shadow-none focus:caret-transparent \
+        overflow-hidden"
         value={text}
         onKeyDown={handleKeyDown}
         onChange={handleChangeText}

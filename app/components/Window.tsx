@@ -3,11 +3,18 @@ import { Card } from "@/components/ui/card";
 import { ReactNode, useRef, useEffect } from "react";
 
 type Props = {
+  defaultMax?: boolean;
   children: ReactNode;
 }
 
-export function Window({ children }: Props) {
+type MouseEventCallback = (e: MouseEvent) => void;
+
+export function Window({ defaultMax, children }: Props) {
   const windowRef = useRef<HTMLDivElement>(null);
+
+  if (typeof defaultMax === undefined) {
+    defaultMax = false;
+  }
 
   let movingWindow = false;
   let movingDisabled = false;
@@ -17,7 +24,7 @@ export function Window({ children }: Props) {
   let screenHeight = 0;
   let mouseOffsetY = 0;
   let mouseOffsetX = 0;
-  let maximized = false;
+  let maximized = defaultMax;
   // let resizingWindow = false;
 
   let clicks = 0;
@@ -34,7 +41,7 @@ export function Window({ children }: Props) {
   }
 
   // TODO: make resizable and moveable
-  function enableMoving(e: React.MouseEvent) {
+  function enableMoving(e: MouseEvent) {
     if (typeof window === undefined) {
       return;
     }
@@ -133,8 +140,8 @@ export function Window({ children }: Props) {
     if (!windowRef?.current) {
       return;
     }
-    windowRef.current.style.width = "1024px";
-    windowRef.current.style.height = "600px";
+    windowRef.current.style.width = "66%";
+    windowRef.current.style.height = "60%";
     windowRef.current.style.top = "25%";
     windowRef.current.style.left = "25%";
   }
@@ -187,25 +194,88 @@ export function Window({ children }: Props) {
   // }
   //
 
+  let prevTouch: Touch;
+  let firstTouch: Touch;
+  let touching = false;
+
+  function onTouchStart(e: TouchEvent, callback: MouseEventCallback) {
+    console.log("touchstart")
+    if (touching) {
+      return;
+    }
+
+    touching = true;
+    firstTouch = e.touches[0];
+    prevTouch = firstTouch;
+
+    const clientX = firstTouch.clientX;
+    const clientY = firstTouch.clientY;
+    const movementX = firstTouch.pageX - prevTouch.pageX;
+    const movementY = firstTouch.pageY - prevTouch.pageY;
+
+    const mouseEvent = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      clientX: clientX,
+      clientY: clientY,
+      movementX: movementX,
+      movementY: movementY
+    })
+
+    callback(mouseEvent);
+  }
+
+  function onTouchMove(e: TouchEvent, callback: MouseEventCallback) {
+    const newTouch = e.touches[0];
+
+    const clientX = newTouch.clientX;
+    const clientY = newTouch.clientY;
+    const movementX = newTouch.pageX - prevTouch.pageX;
+    const movementY = newTouch.pageY - prevTouch.pageY;
+
+    const mouseEvent = new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: clientX,
+      clientY: clientY,
+      movementX: movementX,
+      movementY: movementY
+    })
+
+    callback(mouseEvent);
+
+    prevTouch = newTouch;
+  }
+
+  function onTouchEnd(callback: MouseEventCallback) {
+    const mouseEvent = new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+    })
+    callback(mouseEvent);
+    touching = false;
+  }
   useEffect(() => {
     if (typeof window === undefined) {
       return;
     }
 
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight;
     window.addEventListener("mouseup", disableMoving);
     window.addEventListener("mouseleave", disableMoving);
     window.addEventListener("mousemove", moveWindow);
+    window.addEventListener("touchend", () => onTouchEnd(disableMoving));
+    window.addEventListener("touchcancel", () => onTouchEnd(disableMoving));
+    window.addEventListener("touchmove", (e) => onTouchMove(e, moveWindow));
   }, []);
 
   return (
-    <div ref={windowRef} className="absolute top-1/4 left-1/4 w-[1024px] h-[600px] flex flex-col">
+    <div ref={windowRef} className={`absolute flex flex-col ${maximized ? 'w-full h-full left-0 top-0' : 'w-2/3 h-3/5 left-1/4 top-1/4'}`}>
       <div className="select-none w-full h-5 rounded-t-lg border-slate-600 bg-slate-600 py-auto flex ">
         <button className="w-3 h-3 rounded-full bg-red-700 my-auto mx-1"></button>
         <div className="w-3 h-3 rounded-full bg-yellow-700 my-auto mx-1"></div>
-        <div className="w-3 h-3 rounded-full bg-green-700 my-auto mx-1" onClick={toggleWindowSize}></div>
-        <div className="w-full h-full cursor-grab active:cursor-grabbing" onMouseDown={enableMoving}></div>
+        <div className="w-3 h-3 rounded-full bg-green-700 my-auto mx-1" onMouseUp={toggleWindowSize}></div>
+        <div className="w-full h-full cursor-grab active:cursor-grabbing" onMouseDown={(e: React.MouseEvent) => enableMoving(e.nativeEvent)}
+          onTouchStart={(e: React.TouchEvent) => onTouchStart(e.nativeEvent, enableMoving)}></div>
       </div>
       <Card className="w-full h-full bg-slate-900 rounded-t-none border-slate-600 shadow-slate-500 text-white bg-opacity-40 overflow-hidden">
         {children}
