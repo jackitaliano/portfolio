@@ -1,66 +1,79 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+"use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { TextLine } from "./TextLine"
 import { CmdLine } from "./CmdLine"
 import { InputLine } from "./InputLine"
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { HelpMenu } from "./HelpMenu";
+import { Starter } from "./Starter";
+import { WhoIs } from "./WhoIs";
+import { Experience } from "./Experience";
+import { Contact } from "./Contact";
+import { Projects } from "./Projects";
+import { Unknown } from "./Unknown";
 
 export function Terminal() {
+  const [history, setHistory] = useState<Array<ReactNode>>([<Starter />]);
+  const scrollRef = useRef(null);
+
   const gitInfo = {
-    enabled: true,
-    branch: "main",
-    changes: true,
+    enabled: false,
+    branch: "",
+    changes: false,
     staged: false
   }
 
+  function getCommandOutput(text: string): ReactNode {
+    switch (text) {
+      case "whois":
+        return <WhoIs />
+      case "contact":
+        return <Contact />
+      case "experience":
+        return <Experience />
+      case "projects":
+        return <Projects />
+      case "help":
+        return <HelpMenu />
+      default:
+        return <Unknown text={text} />
+    }
+  }
+
+  function executeText(text: string) {
+    console.log("execute: ", text);
+    const newNode = <CmdLine path="~" git={gitInfo}>{text}</CmdLine>;
+    const outputNode = getCommandOutput(text);
+
+    if (text === "clear") {
+      setHistory([]);
+      return;
+    }
+
+    setHistory((prev) => {
+      prev.push(newNode);
+      prev.push(outputNode);
+      const newHistory = [...prev];
+      return newHistory;
+    });
+  }
+
+  function scrollBottom() {
+    scrollRef.current.scrollIntoView(true);
+  }
+
+  useEffect(scrollBottom, [history]);
   return (
-    <div>
-      <div className="w-full h-5 rounded-t-lg border-slate-600 bg-slate-600 py-auto flex">
-        <div className="w-3 h-3 rounded-full bg-red-700 my-auto mx-1"></div>
-        <div className="w-3 h-3 rounded-full bg-yellow-700 my-auto mx-1"></div>
-        <div className="w-3 h-3 rounded-full bg-green-700 my-auto mx-1"></div>
-      </div>
-      <Card className="w-full h-[600px] bg-slate-900 rounded-t-none border-slate-600 shadow-slate-500 text-white bg-opacity-40 overflow-x-hidden">
+    <ScrollArea className="w-full h-full p-1" onClick={scrollBottom}>
 
-        <div className="w-full h-full overflow-y-hidden">
-          <ScrollArea className="w-full h-full px-1">
-
-            <CmdLine path="~">cd ./info; chmod +x ./info; cp ./info ~/.local/bin;</CmdLine>
-            <CmdLine path="~/info" git={gitInfo}>info user</CmdLine>
-            <TextLine>
-              <p>Jack Italiano</p>
-            </TextLine>
-
-            <CmdLine path="~/info" git={gitInfo}>info headline</CmdLine>
-            <TextLine>
-              <p>A Full-Stack Web and Application Developer soon to be graduating from The Ohio State University with a B.S. Computer Science and Engineering.</p>
-            </TextLine>
-
-            <CmdLine path="~/info" git={gitInfo}>info experience</CmdLine>
-            <TextLine>
-              <p>- NASA: AI/ML & Web Software Engineering Intern</p>
-              <p>- State Farm: Software Engineering Intern</p>
-              <p>- Holocron Tech: AI/ML Devloper</p>
-            </TextLine>
-
-            <CmdLine path="~/info" git={gitInfo}>info contact</CmdLine>
-            <TextLine>
-              <p>- Email: jackitaliano12@gmail.com</p>
-              <p>- Phone: (847) 477-8066</p>
-            </TextLine>
-
-            <CmdLine path="~/info" git={gitInfo}>info -h</CmdLine>
-            <TextLine>
-              <p>Jack Italiano Info Tool</p>
-              <p className="ps-4">user</p>
-              <p className="ps-4">contact</p>
-              <p className="ps-4">experience</p>
-              <p className="ps-4">projects</p>
-            </TextLine>
-            <InputLine path="~/info" git={gitInfo}><p></p></InputLine>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+      {history.map((node, i) =>
+        <div key={i}>
+          {node}
         </div>
-      </Card>
-    </div>
+      )}
+      <InputLine path="~" git={gitInfo} submit={executeText} />
+      <div ref={scrollRef} ></div>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   )
 }

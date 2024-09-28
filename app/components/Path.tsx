@@ -20,7 +20,7 @@ export function Path({ path, git }: Props) {
   }
 
   return (
-    <div className="flex flex-nowrap gap-x-2">
+    <div className="flex flex-nowrap items-center gap-x-2">
       <p className="text-blue-400 text-nowrap">{path}</p>
       {git.enabled ?
         <div className="flex flex-nowrap ">

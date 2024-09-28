@@ -2,18 +2,16 @@ import { Info, Experience } from './pages';
 import { Page, FadeIn, BackgroundImage, MoreButton } from './components';
 import { Terminal } from './components/Terminal';
 import './css/animations.css';
+import { Window } from './components/Window';
 
 export default function Home() {
   return (
-    <div className="flex justify-center">
+    <main className="w-screen h-screen overflow-hidden">
       <BackgroundImage />
-      <div className="flex w-screen max-w-[1000px] h-screen px-8">
-        <main className="flex flex-col justify-center w-full">
-          <Terminal />
-        </main>
-        <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center"></footer>
-      </div>
-    </div>
+      <Window>
+        <Terminal />
+      </Window>
+    </main>
   );
 }
 
