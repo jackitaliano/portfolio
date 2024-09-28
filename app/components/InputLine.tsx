@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { Path } from "./Path";
 
 type Props = {
@@ -9,13 +9,13 @@ type Props = {
     changes: boolean;
     staged: boolean;
   };
-  submit: Function;
+  submit: FunctionStringCallback;
 }
 
 export function InputLine({ path, git, submit }: Props) {
   const [text, setText] = useState("");
 
-  function handleKeyDown(e) {
+  function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter') {
       e.preventDefault();
       submit(text);
@@ -23,7 +23,7 @@ export function InputLine({ path, git, submit }: Props) {
     }
   }
 
-  function handleChangeText(e) {
+  function handleChangeText(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setText(e.target.value);
   }
 

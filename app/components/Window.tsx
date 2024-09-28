@@ -13,8 +13,8 @@ export function Window({ children }: Props) {
   let movingDisabled = false;
   let windowWidth = 0;
   let windowHeight = 0;
-  let screenWidth = window.innerWidth;
-  let screenHeight = window.innerHeight;
+  let screenWidth = 0;
+  let screenHeight = 0;
   let mouseOffsetY = 0;
   let mouseOffsetX = 0;
   let maximized = false;
@@ -34,11 +34,19 @@ export function Window({ children }: Props) {
   }
 
   // TODO: make resizable and moveable
-  function enableMoving(e) {
+  function enableMoving(e: React.MouseEvent) {
+    if (typeof window === undefined) {
+      return;
+    }
+
+    if (!windowRef?.current) {
+      return;
+    }
+
     incrementClicks();
 
     if (clicks >= 2) {
-      toggleWindowSize(e);
+      toggleWindowSize();
     }
 
     movingWindow = true;
@@ -55,7 +63,10 @@ export function Window({ children }: Props) {
     mouseOffsetX = e.clientX - currLeft;
   }
 
-  function moveWindow(e) {
+  function moveWindow(e: MouseEvent) {
+    if (!windowRef?.current) {
+      return;
+    }
     if (!movingWindow || movingDisabled) {
       return;
     }
@@ -91,34 +102,47 @@ export function Window({ children }: Props) {
     windowRef.current.style.left = newLeft + "px";
   }
 
-  function disableMoving(e) {
+  function disableMoving() {
     movingWindow = false;
   }
 
-  function toggleWindowSize(e) {
+  function toggleWindowSize() {
+    if (!windowRef?.current) {
+      return;
+    }
+
     windowRef.current.style.transition = "all 250ms ease";
     movingDisabled = true;
     clicks = 0;
     setTimeout(() => {
+      if (!windowRef?.current) {
+        return;
+      }
       windowRef.current.style.transition = "";
       movingDisabled = false;
     }, 250);
     if (maximized) {
-      minimizeWindow(e);
+      minimizeWindow();
     } else {
-      maximizeWindow(e);
+      maximizeWindow();
     }
     maximized = !maximized;
   }
 
-  function minimizeWindow(e) {
+  function minimizeWindow() {
+    if (!windowRef?.current) {
+      return;
+    }
     windowRef.current.style.width = "1024px";
     windowRef.current.style.height = "600px";
     windowRef.current.style.top = "25%";
     windowRef.current.style.left = "25%";
   }
 
-  function maximizeWindow(e) {
+  function maximizeWindow() {
+    if (!windowRef?.current) {
+      return;
+    }
     windowRef.current.style.width = "100%";
     windowRef.current.style.height = "100%";
     windowRef.current.style.top = "0";
@@ -164,12 +188,15 @@ export function Window({ children }: Props) {
   //
 
   useEffect(() => {
+    if (typeof window === undefined) {
+      return;
+    }
+
+    screenWidth = window.innerWidth;
+    screenHeight = window.innerHeight;
     window.addEventListener("mouseup", disableMoving);
     window.addEventListener("mouseleave", disableMoving);
     window.addEventListener("mousemove", moveWindow);
-    // window.addEventListener("mouseup", disableResize);
-    // window.addEventListener("mouseleave", disableResize);
-    // window.addEventListener("mousemove", resizeDown);
   }, []);
 
   return (

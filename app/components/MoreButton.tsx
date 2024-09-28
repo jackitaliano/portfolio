@@ -14,6 +14,10 @@ export function MoreButton({ scrollId }: Props) {
 
   useEffect(() => {
     const thresh = 250;
+    if (typeof window === undefined) {
+      return;
+    }
+
 
     window.addEventListener("scroll", () => {
       if (!buttonRef?.current) {

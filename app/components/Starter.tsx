@@ -1,6 +1,5 @@
 import { Experience } from "./Experience";
 import { CmdLine } from "./CmdLine";
-import { TextLine } from "./TextLine";
 import { Headline } from "./Headline";
 import { WhoIs } from "./WhoIs";
 import { HelpMenu } from "./HelpMenu";

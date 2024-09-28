@@ -1,6 +1,5 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { TextLine } from "./TextLine"
 import { CmdLine } from "./CmdLine"
 import { InputLine } from "./InputLine"
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -13,8 +12,8 @@ import { Projects } from "./Projects";
 import { Unknown } from "./Unknown";
 
 export function Terminal() {
-  const [history, setHistory] = useState<Array<ReactNode>>([<Starter />]);
-  const scrollRef = useRef(null);
+  const [history, setHistory] = useState<Array<ReactNode>>([<div key={0}><Starter /></div>]);
+  const scrollRef = useRef<null | HTMLDivElement>(null);
 
   const gitInfo = {
     enabled: false,
@@ -59,6 +58,9 @@ export function Terminal() {
   }
 
   function scrollBottom() {
+    if (!scrollRef?.current) {
+      return;
+    }
     scrollRef.current.scrollIntoView(true);
   }
 

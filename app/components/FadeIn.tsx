@@ -1,12 +1,12 @@
 "use client";
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { ReactNode, useRef } from "react"
 
 type Props = {
   children: ReactNode
 }
 
 export function FadeIn({ children }: Props) {
-  const [isVisible, setVisible] = useState(false);
+  // const [isVisible, setVisible] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
 
   // useEffect(() => {
@@ -21,7 +21,7 @@ export function FadeIn({ children }: Props) {
   // }, []);
 
   return (
-    <div ref={domRef} className={`w-full h-full animated ${isVisible ? 'fade-in' : ''}`}>
+    <div ref={domRef} className={`w-full h-full animated `}>
       {children}
     </div>
   )

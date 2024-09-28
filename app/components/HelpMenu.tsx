@@ -3,7 +3,7 @@ import { TextLine } from "./TextLine";
 export function HelpMenu() {
   return (
     <TextLine>
-      <p>Jack's Portfolio CLI Help</p>
+      <p>Jack{'\''}s Portfolio CLI Help</p>
       <div className="flex flex-wrap">
         <p className="ps-4 w-32">whois</p>
         <p>view username</p>

@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export function Experience() {
   return (
     <div>
-  // <Tabs defaultValue="nasa">
-  //   <TabsList className="dark grid w-full grid-cols-3 bg-slate-900/60 backdrop-blur-xl text-white">
-  //     <TabsTrigger value="nasa">NASA</TabsTrigger>
-  //     <TabsTrigger value="statefarm">State Farm</TabsTrigger>
-  //     <TabsTrigger value="holocron">Holocron</TabsTrigger>
-  //   </TabsList>
-  //   <TabsContent value="nasa">
+      <Tabs defaultValue="nasa">
+        <TabsList className="dark grid w-full grid-cols-3 bg-slate-900/60 backdrop-blur-xl text-white">
+          <TabsTrigger value="nasa">NASA</TabsTrigger>
+          <TabsTrigger value="statefarm">State Farm</TabsTrigger>
+          <TabsTrigger value="holocron">Holocron</TabsTrigger>
+        </TabsList>
+        <TabsContent value="nasa">
           <Card className="bg-slate-900 text-white border-none bg-transparent">
             <CardHeader>
               <CardTitle>NASA</CardTitle>
@@ -35,8 +35,8 @@ export function Experience() {
               </div>
             </CardContent>
           </Card>
-    // </TabsContent>
-    // <TabsContent value="statefarm">
+        </TabsContent>
+        <TabsContent value="statefarm">
           <Card className="bg-slate-900 text-white border-none bg-transparent">
             <CardHeader>
               <CardTitle>State Farm</CardTitle>
@@ -59,8 +59,8 @@ export function Experience() {
               </div>
             </CardContent>
           </Card>
-    // </TabsContent>
-    // <TabsContent value="holocron">
+        </TabsContent>
+        <TabsContent value="holocron">
           <Card className="bg-slate-900 text-white border-none bg-transparent">
             <CardHeader>
               <CardTitle>Holocron</CardTitle>
@@ -77,8 +77,8 @@ export function Experience() {
               </div>
             </CardContent>
           </Card>
-    //   </TabsContent>
-    // </Tabs>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
