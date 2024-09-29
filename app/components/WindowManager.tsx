@@ -10,8 +10,8 @@ export function WindowManager() {
   const term = {
     title: "Terminal",
     dimensions: {
-      width: "45%",
-      height: "45%",
+      width: "48%",
+      height: "65%",
       defaultMax: false,
     },
     position: {
@@ -25,7 +25,7 @@ export function WindowManager() {
     title: "Notes",
     dimensions: {
       width: "25%",
-      height: "50%",
+      height: "55%",
       defaultMax: false,
     },
     position: {
