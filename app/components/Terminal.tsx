@@ -9,6 +9,7 @@ import { Contact } from "./Contact";
 import { Projects } from "./Projects";
 import { Unknown } from "./Unknown";
 import { Experience } from "./Experience";
+import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
 
 export function Terminal() {
   const [history, setHistory] = useState<Array<ReactNode>>([<div key={0}><Starter /></div>]);
@@ -21,35 +22,57 @@ export function Terminal() {
     staged: false
   }
 
-  function getCommandOutput(text: string): ReactNode {
-    switch (text) {
+  function getCommandOutput(cmdInput: { cmd: string, args: string }): { node: ReactNode, success: boolean } {
+    const success = true;
+    switch (cmdInput.cmd) {
       case "whois":
-        return <WhoIs />
+        return { node: <WhoIs />, success }
       case "contact":
-        return <Contact />
+        return { node: <Contact />, success }
       case "experience":
-        return <Experience />
+        return { node: <Experience />, success }
       case "projects":
-        return <Projects />
+        return { node: <Projects />, success }
       case "help":
-        return <HelpMenu />
+        return { node: <HelpMenu />, success }
       default:
-        return <Unknown text={text} />
+        return { node: <Unknown text={cmdInput.cmd} />, success: false }
     }
   }
 
   function executeText(text: string) {
-    console.log("execute: ", text);
-    const newNode = <CmdLine path="~" git={gitInfo}>{text}</CmdLine>;
-    const outputNode = getCommandOutput(text);
-
     if (text === "clear") {
       setHistory([]);
       return;
     }
 
+    const split = text.split(" ");
+    console.log("split: ", split)
+    const cmd = split[0];
+    const args = split.length > 1 ? split.slice(1).join(" ") : "";
+    console.log("args: ", args);
+    const cmdInput = { cmd, args }
+
+    const output = getCommandOutput(cmdInput);
+    const outputNode = output.node;
+
+    let cmdNode = <CmdSuccess>{cmdInput.cmd}</CmdSuccess>
+    if (!output.success) {
+      cmdNode = <CmdFail>{cmdInput.cmd}</CmdFail>
+    }
+
+    const argsNode = <CmdArgs>{cmdInput.args}</CmdArgs>
+    const cmdLineNode = <CmdLine path="~" git={gitInfo}>
+      <Cmd>
+        {cmdNode}
+        {argsNode}
+      </Cmd>
+    </CmdLine>;
+
+    console.log(cmdLineNode)
+
     setHistory((prev) => {
-      prev.push(newNode);
+      prev.push(cmdLineNode);
       prev.push(outputNode);
       const newHistory = [...prev];
       return newHistory;
@@ -65,7 +88,7 @@ export function Terminal() {
 
   useEffect(scrollBottom, [history]);
   return (
-    <ScrollArea className="w-full h-full p-1">
+    <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] backdrop-blur-lg">
 
       {history.map((node, i) =>
         <div key={i}>

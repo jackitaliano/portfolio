@@ -14,7 +14,7 @@ p {
 }
 
 @font-face {
-  font-family: 'Space Mono';
+  font-family: 'SpaceMono';
   src: url('fonts/SpaceMono/spacemono-regular.woff2') format('woff2'),
     url('fonts/SpaceMono/spacemono-regular.woff') format('woff');
   font-weight: normal;
@@ -24,8 +24,8 @@ p {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Space Mono";
-  font-style: monospace;
+  font-family: "GeistVF";
+  font-style: normal;
   font-weight: 400;
 }
 

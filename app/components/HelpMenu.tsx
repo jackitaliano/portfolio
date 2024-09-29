@@ -4,6 +4,7 @@ export function HelpMenu() {
   return (
     <TextLine>
       <p>Jack{'\''}s Portfolio CLI Help</p>
+      <p className="px-4 py-2">Type a command for more info.</p>
       <div className="flex flex-wrap">
         <p className="ps-4 w-32">whois</p>
         <p>view username</p>

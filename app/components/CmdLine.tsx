@@ -1,5 +1,7 @@
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 import { Path } from "./Path";
+
+import { Cmd } from "./Cmd";
 
 type Props = {
   path: string;
@@ -9,7 +11,8 @@ type Props = {
     changes: boolean;
     staged: boolean;
   };
-  children: ReactNode
+  success?: boolean;
+  children: ReactElement<typeof Cmd>;
 }
 
 export function CmdLine({ path, git, children }: Props) {
@@ -18,7 +21,8 @@ export function CmdLine({ path, git, children }: Props) {
       <div className="pe-2">
         <Path path={path} git={git} />
       </div>
-      <div className="text-wrap"> {children}
+      <div className="text-wrap">
+        {children}
       </div>
     </div>
   )

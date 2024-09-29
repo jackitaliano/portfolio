@@ -1,14 +1,13 @@
 import { BackgroundImage } from './components';
-import { Terminal } from './components/Terminal';
-import { Window } from './components/Window';
+import { WindowManager } from './components/WindowManager';
+
 
 export default function Home() {
+
   return (
     <main className="w-screen h-screen overflow-hidden">
       <BackgroundImage />
-      <Window>
-        <Terminal />
-      </Window>
+      <WindowManager />
     </main>
   );
 }
