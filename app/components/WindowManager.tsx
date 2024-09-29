@@ -11,11 +11,11 @@ export function WindowManager() {
     title: "Terminal",
     dimensions: {
       width: "48%",
-      height: "65%",
+      height: "70%",
       defaultMax: false,
     },
     position: {
-      top: "20%",
+      top: "11%",
       left: "30%",
     },
     index: top,
@@ -29,7 +29,7 @@ export function WindowManager() {
       defaultMax: false,
     },
     position: {
-      top: "15%",
+      top: "8%",
       left: "3%",
     },
     index: 1,
@@ -43,7 +43,7 @@ export function WindowManager() {
       defaultMax: false,
     },
     position: {
-      top: "22%",
+      top: "9%",
       left: "80%",
     },
     index: 0,

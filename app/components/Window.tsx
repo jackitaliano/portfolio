@@ -152,7 +152,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
       return;
     }
 
-    windowRef.current.style.transition = "all 250ms ease";
+    windowRef.current.style.transition = "all 150ms ease";
     movingDisabled = true;
     clicks = 0;
     setTimeout(() => {
@@ -161,7 +161,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
       }
       windowRef.current.style.transition = "";
       movingDisabled = false;
-    }, 250);
+    }, 150);
     if (maximized) {
       minimizeWindow();
     } else {
