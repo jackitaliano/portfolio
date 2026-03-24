@@ -26,13 +26,16 @@ type Props = {
   dimensions: Dimensions;
   position: Position;
   index: number;
-  ctx: WindowContext;
+  ctx?: WindowContext;
   children: ReactNode;
 }
 
 type MouseEventCallback = (e: MouseEvent) => void;
 
 export function Window({ title, dimensions, position, index, ctx, children }: Props) {
+  const windowCtx: WindowContext = ctx || {
+    enterCallback: () => { },
+  };
   const windowRef = useRef<HTMLDivElement>(null);
 
   if (typeof dimensions?.defaultMax === undefined) {
@@ -312,10 +315,10 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   }
 
   return (
-    <div ref={windowRef}
+      <div ref={windowRef}
       style={style}
       className={`absolute flex flex-col ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
-      onMouseDown={() => ctx.enterCallback(setZIndex)}
+      onMouseDown={() => windowCtx.enterCallback(setZIndex)}
     >
       <div className="select-none w-full h-6 rounded-t-lg bg-slate-600 py-auto flex ">
         <button className="w-[12px] h-[12px] rounded-full bg-red-700 my-auto mx-1"></button>

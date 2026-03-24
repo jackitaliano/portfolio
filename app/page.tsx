@@ -1,4 +1,8 @@
 import { BackgroundImage } from './components';
+import { Image } from './components/Image';
+import { Notes } from './components/Notes';
+import { Terminal } from './components/Terminal';
+import { Window } from './components/Window';
 import { WindowManager } from './components/WindowManager';
 
 
@@ -7,7 +11,32 @@ export default function Home() {
   return (
     <main className="w-screen h-screen overflow-hidden">
       <BackgroundImage />
-      <WindowManager />
+      <WindowManager>
+        <Window
+          title="Terminal"
+          dimensions={{ width: "48%", height: "70%", defaultMax: false }}
+          position={{ top: "11%", left: "30%" }}
+          index={2}
+        >
+          <Terminal />
+        </Window>
+        <Window
+          title="Notes"
+          dimensions={{ width: "25%", height: "55%", defaultMax: false }}
+          position={{ top: "8%", left: "3%" }}
+          index={1}
+        >
+          <Notes />
+        </Window>
+        <Window
+          title="Image"
+          dimensions={{ width: "200px", height: "200px", defaultMax: false }}
+          position={{ top: "9%", left: "80%" }}
+          index={0}
+        >
+          <Image imageSrc="/static/images/headshot.jpeg" />
+        </Window>
+      </WindowManager>
     </main>
   );
 }

@@ -1,73 +1,47 @@
 "use client";
-import { Notes } from './Notes';
-import { Terminal } from './Terminal';
-import { Image } from './Image';
+import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useRef } from "react";
 import { Window, WindowContext } from './Window';
 
-export function WindowManager() {
-  let top = 2;
+type WindowChildProps = {
+  index?: number;
+  ctx?: WindowContext;
+}
 
-  const term = {
-    title: "Terminal",
-    dimensions: {
-      width: "48%",
-      height: "70%",
-      defaultMax: false,
-    },
-    position: {
-      top: "11%",
-      left: "30%",
-    },
-    index: top,
-  };
+type Props = {
+  children: ReactNode;
+}
 
-  const notes = {
-    title: "Notes",
-    dimensions: {
-      width: "25%",
-      height: "55%",
-      defaultMax: false,
-    },
-    position: {
-      top: "8%",
-      left: "3%",
-    },
-    index: 1,
-  };
+export function WindowManager({ children }: Props) {
+  const topRef = useRef(0);
+  const windowChildren = Children.toArray(children).filter((child): child is ReactElement<WindowChildProps> => isValidElement(child));
 
-  const headShot = {
-    title: "Image",
-    dimensions: {
-      width: "200px",
-      height: "200px",
-      defaultMax: false,
-    },
-    position: {
-      top: "9%",
-      left: "80%",
-    },
-    index: 0,
-  };
+  const maxIndex = windowChildren.reduce((highest, child) => {
+    if (typeof child.props.index !== "number") {
+      return highest;
+    }
+    return Math.max(highest, child.props.index);
+  }, 0);
+
+  if (topRef.current < maxIndex) {
+    topRef.current = maxIndex;
+  }
 
 
   const windowCtx: WindowContext = {
     enterCallback: (setZIndexCallback) => {
-      top += 1;
-      setZIndexCallback(top);
+      topRef.current += 1;
+      setZIndexCallback(topRef.current);
     }
   }
 
   return (
     <div>
-      <Window title={term.title} dimensions={term.dimensions} position={term.position} index={term.index} ctx={windowCtx}>
-        <Terminal />
-      </Window>
-      <Window title={notes.title} dimensions={notes.dimensions} position={notes.position} index={notes.index} ctx={windowCtx}>
-        <Notes />
-      </Window>
-      <Window title={headShot.title} dimensions={headShot.dimensions} position={headShot.position} index={headShot.index} ctx={windowCtx}>
-        <Image imageSrc="/static/images/headshot.jpeg" />
-      </Window>
+      {windowChildren.map((child, i) =>
+        cloneElement(child, {
+          key: child.key ?? i,
+          ctx: windowCtx,
+        })
+      )}
     </div>
   )
 
