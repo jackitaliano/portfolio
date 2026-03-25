@@ -3,7 +3,12 @@ export type ShellStdout = (line: string) => void;
 export type Shell = (
   command: string,
   args: string[],
-  stdout: ShellStdout
+  echo: ShellStdout
+) => number | Promise<number>;
+
+export type Command = (
+  args: string[],
+  echo: ShellStdout
 ) => number | Promise<number>;
 
 const shellHelpLines = [
@@ -18,33 +23,41 @@ const shellHelpLines = [
   "\thelp - see this menu",
 ];
 
-const shellOutputs: Record<string, string[]> = {
-  whois: ["Jack Italiano"],
-  contact: ["Email: jackitaliano12@gmail.com", "Phone: (847) 477-8066"],
-  experience: [
-    "NASA - AI/ML & Web Software Engineering Intern",
-    "State Farm - Software Engineering Intern",
-    "Holocron Tech - AI/ML Developer",
-  ],
-  projects: [
-    "BIDARA - Open-Source Aerospace AI Research and Design Tool",
-    "OAIT - OpenAI Tools, a CLI Utility",
-    "Audio Studio Code - Speech-To-Text IDE",
-    "Run `projects -m` for more projects",
-  ],
-  help: shellHelpLines,
+const shellCommands: Record<string, Command> = {
+  help: (_, echo) => {
+    shellHelpLines.forEach((line) => echo(line));
+    return 0
+  },
+  whois: (_, echo) => {
+    echo("Jack Italiano")
+    return 0;
+  },
+  contact: (_, echo) => {
+    echo("Email: jackitaliano12@gmail.com")
+    echo("Phone: (847) 477-8066")
+    return 0;
+  },
+  experience: (_, echo) => {
+    echo( "NASA - AI/ML & Web Software Engineering Intern" )
+    echo( "State Farm - Software Engineering Intern" )
+    echo( "Holocron Tech - AI/ML Developer" )
+    return 0;
+  },
 };
 
-export const portfolioShell: Shell = (command, args, stdout) => {
+
+export const portfolioShell: Shell = (command, args, echo) => {
   void args;
   const normalizedCommand = command.trim().toLowerCase();
-  const lines = shellOutputs[normalizedCommand];
 
-  if (!lines) {
-    stdout(`'${command}': command not found`);
+  const shellCommand = shellCommands[normalizedCommand];
+
+  if (!shellCommand) {
+    echo(`'${command}': command not found`);
     return 1;
   }
 
-  lines.forEach((line) => stdout(line));
-  return 0;
+  const exitCode = shellCommand(args, echo);
+
+  return exitCode;
 };

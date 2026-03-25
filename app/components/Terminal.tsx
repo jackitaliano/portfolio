@@ -1,6 +1,6 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { Shell } from "../shell/portfolioShell";
 import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
 import { CmdLine } from "./CmdLine";
@@ -17,6 +17,13 @@ type Props = {
   startupCommands?: StartupCommand[];
 };
 
+const gitInfo = {
+  enabled: false,
+  branch: "",
+  changes: false,
+  staged: false,
+};
+
 function decodeEscapedText(text: string): string {
   return text
     .replace(/\\n/g, "\n")
@@ -29,14 +36,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const hasRunStartup = useRef(false);
 
-  const gitInfo = {
-    enabled: false,
-    branch: "",
-    changes: false,
-    staged: false
-  }
-
-  async function runCommand(command: string, args: string[]) {
+  const runCommand = useCallback(async (command: string, args: string[]) => {
     const normalizedCommand = command.trim();
     if (!normalizedCommand) {
       return;
@@ -83,7 +83,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
 
       return [...prev, cmdLineNode, outputNode];
     });
-  }
+  }, [shell]);
 
   async function executeText(text: string) {
     const trimmedText = text.trim();
@@ -120,7 +120,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
     }
 
     void runStartupCommands();
-  }, [startupCommands]);
+  }, [runCommand, startupCommands]);
 
   return (
     <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
