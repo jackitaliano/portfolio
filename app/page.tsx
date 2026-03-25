@@ -1,12 +1,22 @@
+"use client";
+
 import { BackgroundImage } from './components';
-import { Image } from './components/Image';
+import { Image as ProfileImage } from './components/Image';
 import { Notes } from './components/Notes';
 import { Terminal } from './components/Terminal';
 import { Window } from './components/Window';
 import { WindowManager } from './components/WindowManager';
+import { portfolioShell } from './shell/portfolioShell';
 
 
 export default function Home() {
+  const terminalStartupCommands = [
+    { command: "whois", args: [] },
+    { command: "contact", args: [] },
+    { command: "experience", args: ["-s"] },
+    { command: "projects", args: [] },
+    { command: "help", args: [] },
+  ];
 
   return (
     <main className="w-screen h-screen overflow-hidden">
@@ -18,7 +28,7 @@ export default function Home() {
           position={{ top: "11%", left: "30%" }}
           index={2}
         >
-          <Terminal />
+          <Terminal shell={portfolioShell} startupCommands={terminalStartupCommands} />
         </Window>
         <Window
           title="Notes"
@@ -34,7 +44,7 @@ export default function Home() {
           position={{ top: "9%", left: "80%" }}
           index={0}
         >
-          <Image imageSrc="/static/images/headshot.jpeg" />
+          <ProfileImage imageSrc="/static/images/headshot.jpeg" />
         </Window>
       </WindowManager>
     </main>

@@ -1,19 +1,33 @@
-"use client"; import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { CmdLine } from "./CmdLine"
-import { InputLine } from "./InputLine"
+"use client";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { HelpMenu } from "./HelpMenu";
-import { Starter } from "./Starter";
-import { WhoIs } from "./WhoIs";
-import { Contact } from "./Contact";
-import { Projects } from "./Projects";
-import { Unknown } from "./Unknown";
-import { Experience } from "./Experience";
+import { Shell } from "../shell/portfolioShell";
 import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
+import { CmdLine } from "./CmdLine";
+import { InputLine } from "./InputLine";
+import { TextLine } from "./TextLine";
 
-export function Terminal() {
-  const [history, setHistory] = useState<Array<ReactNode>>([<div key={0}><Starter /></div>]);
+export type StartupCommand = {
+  command: string;
+  args: string[];
+};
+
+type Props = {
+  shell: Shell;
+  startupCommands?: StartupCommand[];
+};
+
+function decodeEscapedText(text: string): string {
+  return text
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/\\r/g, "\r");
+}
+
+export function Terminal({ shell, startupCommands = [] }: Props) {
+  const [history, setHistory] = useState<Array<ReactNode>>([]);
   const scrollRef = useRef<null | HTMLDivElement>(null);
+  const hasRunStartup = useRef(false);
 
   const gitInfo = {
     enabled: false,
@@ -22,46 +36,32 @@ export function Terminal() {
     staged: false
   }
 
-  function getCommandOutput(cmdInput: { cmd: string, args: string }): { node: ReactNode, success: boolean } {
-    const success = true;
-    switch (cmdInput.cmd) {
-      case "whois":
-        return { node: <WhoIs />, success }
-      case "contact":
-        return { node: <Contact />, success }
-      case "experience":
-        return { node: <Experience />, success }
-      case "projects":
-        return { node: <Projects />, success }
-      case "help":
-        return { node: <HelpMenu />, success }
-      default:
-        return { node: <Unknown text={cmdInput.cmd} />, success: false }
+  async function runCommand(command: string, args: string[]) {
+    const normalizedCommand = command.trim();
+    if (!normalizedCommand) {
+      return;
     }
-  }
 
-  function executeText(text: string) {
-    if (text === "clear") {
+    if (normalizedCommand === "clear") {
       setHistory([]);
       return;
     }
 
-    const split = text.split(" ");
-    console.log("split: ", split)
-    const cmd = split[0];
-    const args = split.length > 1 ? split.slice(1).join(" ") : "";
-    console.log("args: ", args);
-    const cmdInput = { cmd, args }
+    const argsText = args.join(" ");
+    const stdoutLines: string[] = [];
 
-    const output = getCommandOutput(cmdInput);
-    const outputNode = output.node;
+    const exitCode = await Promise.resolve(
+      shell(normalizedCommand, args, (line) => {
+        stdoutLines.push(line);
+      })
+    );
 
-    let cmdNode = <CmdSuccess>{cmdInput.cmd}</CmdSuccess>
-    if (!output.success) {
-      cmdNode = <CmdFail>{cmdInput.cmd}</CmdFail>
+    let cmdNode = <CmdSuccess>{normalizedCommand}</CmdSuccess>;
+    if (exitCode !== 0) {
+      cmdNode = <CmdFail>{normalizedCommand}</CmdFail>;
     }
 
-    const argsNode = <CmdArgs>{cmdInput.args}</CmdArgs>
+    const argsNode = <CmdArgs>{argsText}</CmdArgs>;
     const cmdLineNode = <CmdLine path="~" git={gitInfo}>
       <Cmd>
         {cmdNode}
@@ -69,14 +69,32 @@ export function Terminal() {
       </Cmd>
     </CmdLine>;
 
-    console.log(cmdLineNode)
+    const decodedStdout = stdoutLines.map((line) => decodeEscapedText(line));
+    const outputNode = decodedStdout.length > 0 ? (
+      <TextLine>
+        <div className="whitespace-pre-wrap">{decodedStdout.join("\n")}</div>
+      </TextLine>
+    ) : null;
 
     setHistory((prev) => {
-      prev.push(cmdLineNode);
-      prev.push(outputNode);
-      const newHistory = [...prev];
-      return newHistory;
+      if (!outputNode) {
+        return [...prev, cmdLineNode];
+      }
+
+      return [...prev, cmdLineNode, outputNode];
     });
+  }
+
+  async function executeText(text: string) {
+    const trimmedText = text.trim();
+    if (!trimmedText) {
+      return;
+    }
+
+    const split = trimmedText.split(" ").filter((part) => part.length > 0);
+    const command = split[0];
+    const args = split.slice(1);
+    await runCommand(command, args);
   }
 
   function scrollBottom() {
@@ -87,6 +105,23 @@ export function Terminal() {
   }
 
   useEffect(scrollBottom, [history]);
+
+  useEffect(() => {
+    if (hasRunStartup.current) {
+      return;
+    }
+
+    hasRunStartup.current = true;
+
+    async function runStartupCommands() {
+      for (const startupCommand of startupCommands) {
+        await runCommand(startupCommand.command, startupCommand.args);
+      }
+    }
+
+    void runStartupCommands();
+  }, [startupCommands]);
+
   return (
     <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
 

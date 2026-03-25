@@ -1,6 +1,6 @@
 "use client";
 import { Children, cloneElement, isValidElement, ReactElement, ReactNode, useRef } from "react";
-import { Window, WindowContext } from './Window';
+import { WindowContext } from './Window';
 
 type WindowChildProps = {
   index?: number;
