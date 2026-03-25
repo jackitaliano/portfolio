@@ -14,29 +14,28 @@ export default function Home() {
     { command: "whois", args: [] },
     { command: "contact", args: [] },
     { command: "experience", args: ["-s"] },
-    { command: "projects", args: [] },
     { command: "help", args: [] },
   ];
 
-  const aboutMeNotes = `# Who am I?
+  const aboutMeNotes = `# About Me
 
-I'm a 21 year old college student with a passion for technology.
+I'm a 23 year old Software Engineer, currently working at State Farm.
 
-# Goals?
+# Goals
 
-As I enter the workforce, my main hope is to have an impact. I want to contribute to a project that affects someone's daily life, as that is what will motivate me to do my best.
-
-# Hobbies?
-
-- Golfer, Snowboarder/Skier, Runner
-- Fraternity Risk Manager, Website Coordinator, Professional Development Lead
-- Lacrosse player, Football player, and Cross Country runner
-- Lifelong Learner and Problem Solver
+Having just graduated college and starting work with State Farm, my primary goal is to learn as much as I can to become the best engineer I can.
 `;
 
   const aboutPageNotes = `# Why is this page like this?
 
-I don't love UI dev, but I do love solving interesting problems. Creating a desktop environment with a functional terminal, an app I live in, felt interesting enough to make.`
+I don't love Web dev, but I do love solving interesting problems. 
+
+Creating a desktop environment with a functional terminal, an app I live in, felt interesting enough to make.
+
+The windows are fully functional, and the terminal has a "shell" behind it. Try entering a command found in \`help\`.
+
+For now, I've entirely ignored mobile, because I've yet to decide how that would work with this idea.
+`
 
   return (
     <main className="w-screen h-screen overflow-hidden">
@@ -44,8 +43,8 @@ I don't love UI dev, but I do love solving interesting problems. Creating a desk
       <WindowManager>
         <Window
           title="Notes"
-          dimensions={{ width: "25%", height: "25%", defaultMax: false }}
-          position={{ top: "60%", left: "60%" }}
+          dimensions={{ width: "25%", height: "55%", defaultMax: false }}
+          position={{ top: "8%", left: "3%" }}
           index={4}
         >
           <Notes markdown={aboutPageNotes} />
@@ -60,8 +59,8 @@ I don't love UI dev, but I do love solving interesting problems. Creating a desk
         </Window>
         <Window
           title="Notes"
-          dimensions={{ width: "25%", height: "55%", defaultMax: false }}
-          position={{ top: "8%", left: "3%" }}
+          dimensions={{ width: "25%", height: "40%", defaultMax: false }}
+          position={{ top: "60%", left: "70%" }}
           index={1}
         >
           <Notes markdown={aboutMeNotes} />

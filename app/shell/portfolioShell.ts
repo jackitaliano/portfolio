@@ -65,6 +65,8 @@ const shellCommands: Record<string, Command> = {
     return 0;
   },
   experience: (_, echo) => {
+    echo( "State Farm - SWE II" )
+    echo( "State Farm - SWE I" )
     echo( "NASA - AI/ML & Web Software Engineering Intern" )
     echo( "State Farm - Software Engineering Intern" )
     echo( "Holocron Tech - AI/ML Developer" )
