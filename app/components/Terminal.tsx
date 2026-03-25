@@ -1,7 +1,7 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { Shell } from "../shell/portfolioShell";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Shell, ShellClass, ShellGitInfo, ShellHistoryLine } from "../shell/portfolioShell";
 import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
 import { CmdLine } from "./CmdLine";
 import { InputLine } from "./InputLine";
@@ -13,16 +13,21 @@ export type StartupCommand = {
 };
 
 type Props = {
-  shell: Shell;
+  shell: ShellClass;
   startupCommands?: StartupCommand[];
 };
 
-const gitInfo = {
-  enabled: false,
-  branch: "",
-  changes: false,
-  staged: false,
+type ShellUiState = {
+  cwd: string;
+  gitInfo: ShellGitInfo;
 };
+
+function readShellUiState(shellProcess: Shell): ShellUiState {
+  return {
+    cwd: shellProcess.getCwd(),
+    gitInfo: shellProcess.getGitInfo(),
+  };
+}
 
 function decodeEscapedText(text: string): string {
   return text
@@ -31,59 +36,96 @@ function decodeEscapedText(text: string): string {
     .replace(/\\r/g, "\r");
 }
 
+type RenderLine = {
+  kind: "command" | "output";
+  key: string;
+  exitCode: number;
+  content: string;
+};
+
+function buildRenderLines(history: ShellHistoryLine[]): RenderLine[] {
+  const lines: RenderLine[] = [];
+  let outputBuffer: string[] = [];
+  let outputExitCode = 0;
+  let outputStartIndex = 0;
+
+  function flushOutput() {
+    if (outputBuffer.length === 0) {
+      return;
+    }
+
+    lines.push({
+      kind: "output",
+      key: `out-${outputStartIndex}`,
+      exitCode: outputExitCode,
+      content: outputBuffer.join("\n"),
+    });
+
+    outputBuffer = [];
+  }
+
+  history.forEach((line, index) => {
+    if (line.isCommand) {
+      flushOutput();
+      lines.push({
+        kind: "command",
+        key: `cmd-${index}`,
+        exitCode: line.exitCode,
+        content: line.content,
+      });
+      return;
+    }
+
+    if (outputBuffer.length === 0) {
+      outputStartIndex = index;
+      outputExitCode = line.exitCode;
+    }
+
+    outputBuffer.push(decodeEscapedText(line.content));
+  });
+
+  flushOutput();
+
+  return lines;
+}
+
 export function Terminal({ shell, startupCommands = [] }: Props) {
-  const [history, setHistory] = useState<Array<ReactNode>>([]);
+  const shellRef = useRef<Shell | null>(null);
+
+  if (!shellRef.current) {
+    shellRef.current = new shell(() => { });
+  }
+
+  const [shellUiState, setShellUiState] = useState<ShellUiState>(() => readShellUiState(shellRef.current as Shell));
+  const [history, setHistory] = useState<ShellHistoryLine[]>(() => (shellRef.current as Shell).getHistory());
+  const [activeCommandCount, setActiveCommandCount] = useState(0);
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const hasRunStartup = useRef(false);
 
   const runCommand = useCallback(async (command: string, args: string[]) => {
+    if (!shellRef.current) {
+      return;
+    }
+
+    const shellProcess = shellRef.current;
     const normalizedCommand = command.trim();
     if (!normalizedCommand) {
       return;
     }
 
     if (normalizedCommand === "clear") {
-      setHistory([]);
+      shellProcess.clearHistory();
       return;
     }
 
-    const argsText = args.join(" ");
-    const stdoutLines: string[] = [];
+    setActiveCommandCount((prev) => prev + 1);
 
-    const exitCode = await Promise.resolve(
-      shell(normalizedCommand, args, (line) => {
-        stdoutLines.push(line);
-      })
-    );
-
-    let cmdNode = <CmdSuccess>{normalizedCommand}</CmdSuccess>;
-    if (exitCode !== 0) {
-      cmdNode = <CmdFail>{normalizedCommand}</CmdFail>;
+    try {
+      await Promise.resolve(shellProcess.run(normalizedCommand, args));
+    } finally {
+      setActiveCommandCount((prev) => Math.max(0, prev - 1));
     }
-
-    const argsNode = <CmdArgs>{argsText}</CmdArgs>;
-    const cmdLineNode = <CmdLine path="~" git={gitInfo}>
-      <Cmd>
-        {cmdNode}
-        {argsNode}
-      </Cmd>
-    </CmdLine>;
-
-    const decodedStdout = stdoutLines.map((line) => decodeEscapedText(line));
-    const outputNode = decodedStdout.length > 0 ? (
-      <TextLine>
-        <div className="whitespace-pre-wrap">{decodedStdout.join("\n")}</div>
-      </TextLine>
-    ) : null;
-
-    setHistory((prev) => {
-      if (!outputNode) {
-        return [...prev, cmdLineNode];
-      }
-
-      return [...prev, cmdLineNode, outputNode];
-    });
-  }, [shell]);
+  }, []);
 
   async function executeText(text: string) {
     const trimmedText = text.trim();
@@ -107,6 +149,22 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   useEffect(scrollBottom, [history]);
 
   useEffect(() => {
+    if (!shellRef.current) {
+      return;
+    }
+
+    const shellProcess = shellRef.current;
+    const syncShellState = () => {
+      setHistory(shellProcess.getHistory());
+      setShellUiState(readShellUiState(shellProcess));
+    };
+
+    syncShellState();
+
+    return shellProcess.subscribe(syncShellState);
+  }, []);
+
+  useEffect(() => {
     if (hasRunStartup.current) {
       return;
     }
@@ -125,12 +183,36 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   return (
     <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
 
-      {history.map((node, i) =>
-        <div key={i}>
-          {node}
-        </div>
-      )}
-      <InputLine path="~" git={gitInfo} submit={executeText} />
+      {buildRenderLines(history).map((line) => {
+        if (line.kind === "command") {
+          const split = line.content.split(" ").filter((part) => part.length > 0);
+          const command = split[0] || "";
+          const argsText = split.slice(1).join(" ");
+          const cmdNode = line.exitCode === 0
+            ? <CmdSuccess>{command}</CmdSuccess>
+            : <CmdFail>{command}</CmdFail>;
+
+          return (
+            <div key={line.key}>
+              <CmdLine path={shellUiState.cwd} git={shellUiState.gitInfo}>
+                <Cmd>
+                  {cmdNode}
+                  <CmdArgs>{argsText}</CmdArgs>
+                </Cmd>
+              </CmdLine>
+            </div>
+          )
+        }
+
+        return (
+          <div key={line.key}>
+            <TextLine>
+              <div className="whitespace-pre-wrap">{line.content}</div>
+            </TextLine>
+          </div>
+        )
+      })}
+      {activeCommandCount === 0 ? <InputLine path={shellUiState.cwd} git={shellUiState.gitInfo} submit={executeText} /> : null}
       <div ref={scrollRef} ></div>
       <ScrollBar orientation="vertical" />
     </ScrollArea>

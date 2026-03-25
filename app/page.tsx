@@ -6,7 +6,7 @@ import { Notes } from './components/Notes';
 import { Terminal } from './components/Terminal';
 import { Window } from './components/Window';
 import { WindowManager } from './components/WindowManager';
-import { portfolioShell } from './shell/portfolioShell';
+import { PortfolioShell } from './shell/portfolioShell';
 
 
 export default function Home() {
@@ -28,7 +28,7 @@ export default function Home() {
           position={{ top: "11%", left: "30%" }}
           index={2}
         >
-          <Terminal shell={portfolioShell} startupCommands={terminalStartupCommands} />
+          <Terminal shell={PortfolioShell} startupCommands={terminalStartupCommands} />
         </Window>
         <Window
           title="Notes"
