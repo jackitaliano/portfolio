@@ -1,7 +1,7 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Shell, ShellClass, ShellGitInfo, ShellHistoryLine } from "../shell/portfolioShell";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { Shell, ShellClass, ShellEvent, ShellGitInfo, ShellHistoryLine } from "../shell/portfolioShell";
 import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
 import { CmdLine } from "./CmdLine";
 import { InputLine } from "./InputLine";
@@ -42,6 +42,40 @@ type RenderLine = {
   exitCode: number;
   content: string;
 };
+
+const TerminalCommandRow = memo(function TerminalCommandRow({
+  path,
+  git,
+  line,
+}: {
+  path: string;
+  git: ShellGitInfo;
+  line: RenderLine;
+}) {
+  const split = line.content.split(" ").filter((part) => part.length > 0);
+  const command = split[0] || "";
+  const argsText = split.slice(1).join(" ");
+  const cmdNode = line.exitCode === 0
+    ? <CmdSuccess>{command}</CmdSuccess>
+    : <CmdFail>{command}</CmdFail>;
+
+  return (
+    <CmdLine path={path} git={git}>
+      <Cmd>
+        {cmdNode}
+        <CmdArgs>{argsText}</CmdArgs>
+      </Cmd>
+    </CmdLine>
+  )
+});
+
+const TerminalOutputRow = memo(function TerminalOutputRow({ content }: { content: string }) {
+  return (
+    <TextLine>
+      <div className="whitespace-pre-wrap">{content}</div>
+    </TextLine>
+  )
+});
 
 function buildRenderLines(history: ShellHistoryLine[]): RenderLine[] {
   const lines: RenderLine[] = [];
@@ -90,6 +124,7 @@ function buildRenderLines(history: ShellHistoryLine[]): RenderLine[] {
 }
 
 export function Terminal({ shell, startupCommands = [] }: Props) {
+  console.log("rendering terminal")
   const shellRef = useRef<Shell | null>(null);
 
   if (!shellRef.current) {
@@ -97,7 +132,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   }
 
   const [shellUiState, setShellUiState] = useState<ShellUiState>(() => readShellUiState(shellRef.current as Shell));
-  const [history, setHistory] = useState<ShellHistoryLine[]>(() => (shellRef.current as Shell).getHistory());
+  const [renderLines, setRenderLines] = useState<RenderLine[]>(() => buildRenderLines((shellRef.current as Shell).getHistory()));
   const [activeCommandCount, setActiveCommandCount] = useState(0);
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const hasRunStartup = useRef(false);
@@ -146,7 +181,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
     scrollRef.current.scrollIntoView(true);
   }
 
-  useEffect(scrollBottom, [history]);
+  useEffect(scrollBottom, [renderLines]);
 
   useEffect(() => {
     if (!shellRef.current) {
@@ -155,13 +190,55 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
 
     const shellProcess = shellRef.current;
     const syncShellState = () => {
-      setHistory(shellProcess.getHistory());
+      setRenderLines(buildRenderLines(shellProcess.getHistory()));
       setShellUiState(readShellUiState(shellProcess));
     };
 
     syncShellState();
 
-    return shellProcess.subscribe(syncShellState);
+    return shellProcess.subscribe((event: ShellEvent) => {
+      if (event.type === "append") {
+        setRenderLines((prev) => {
+          const next = [...prev];
+
+          event.lines.forEach((historyLine) => {
+            if (historyLine.isCommand) {
+              next.push({
+                kind: "command",
+                key: `cmd-append-${next.length}`,
+                exitCode: historyLine.exitCode,
+                content: historyLine.content,
+              });
+              return;
+            }
+
+            const decodedContent = decodeEscapedText(historyLine.content);
+            const lastLine = next[next.length - 1];
+
+            if (lastLine && lastLine.kind === "output") {
+              next[next.length - 1] = {
+                ...lastLine,
+                content: `${lastLine.content}\n${decodedContent}`,
+              };
+              return;
+            }
+
+            next.push({
+              kind: "output",
+              key: `out-append-${next.length}`,
+              exitCode: historyLine.exitCode,
+              content: decodedContent,
+            });
+          });
+
+          return next;
+        });
+        return;
+      }
+
+      setShellUiState(readShellUiState(shellProcess));
+      setRenderLines(buildRenderLines(shellProcess.getHistory()));
+    });
   }, []);
 
   useEffect(() => {
@@ -183,32 +260,18 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   return (
     <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
 
-      {buildRenderLines(history).map((line) => {
+      {renderLines.map((line) => {
         if (line.kind === "command") {
-          const split = line.content.split(" ").filter((part) => part.length > 0);
-          const command = split[0] || "";
-          const argsText = split.slice(1).join(" ");
-          const cmdNode = line.exitCode === 0
-            ? <CmdSuccess>{command}</CmdSuccess>
-            : <CmdFail>{command}</CmdFail>;
-
           return (
             <div key={line.key}>
-              <CmdLine path={shellUiState.cwd} git={shellUiState.gitInfo}>
-                <Cmd>
-                  {cmdNode}
-                  <CmdArgs>{argsText}</CmdArgs>
-                </Cmd>
-              </CmdLine>
+              <TerminalCommandRow path={shellUiState.cwd} git={shellUiState.gitInfo} line={line} />
             </div>
           )
         }
 
         return (
           <div key={line.key}>
-            <TextLine>
-              <div className="whitespace-pre-wrap">{line.content}</div>
-            </TextLine>
+            <TerminalOutputRow content={line.content} />
           </div>
         )
       })}

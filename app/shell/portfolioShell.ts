@@ -13,13 +13,22 @@ export type ShellHistoryLine = {
   content: string;
 };
 
+export type ShellEvent =
+  | {
+    type: "append";
+    lines: ShellHistoryLine[];
+  }
+  | {
+    type: "write";
+  };
+
 export interface Shell {
   run(command: string, args: string[]): number | Promise<number>;
   getCwd(): string;
   getGitInfo(): ShellGitInfo;
   getHistory(): ShellHistoryLine[];
   clearHistory(): void;
-  subscribe(listener: () => void): () => void;
+  subscribe(listener: (event: ShellEvent) => void): () => void;
 }
 
 export type ShellClass = new (echo: ShellStdout) => Shell;
@@ -61,12 +70,26 @@ const shellCommands: Record<string, Command> = {
     echo( "Holocron Tech - AI/ML Developer" )
     return 0;
   },
-  repeat: async (_, echo) => {
+  repeat: async (args, echo) => {
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    for (let i = 0; i < 5; i++) {
+    let num = 0;
+    if (args.length == 0) {
+      num = 5
+    }
+    else if (args.length == 1) {
+      if (!Number.isFinite(Number(args[0]))) {
+        echo(`'${args[0]}' is not a number`)
+        return 1
+      }
+
+      num = Number(args[0])
+    }
+
+
+    for (let i = 0; i < num; i++) {
       echo("test " + i)
-      await delay(1000);
+      await delay(1);
     }
 
     return 0
@@ -83,7 +106,7 @@ export class PortfolioShell implements Shell {
     staged: false,
   };
   private history: ShellHistoryLine[] = [];
-  private listeners: Set<() => void> = new Set();
+  private listeners: Set<(event: ShellEvent) => void> = new Set();
 
   constructor(echo: ShellStdout) {
     this.echo = echo;
@@ -92,63 +115,59 @@ export class PortfolioShell implements Shell {
   run(command: string, args: string[]): number | Promise<number> {
     const normalizedCommand = command.trim().toLowerCase();
     const commandContent = [command.trim(), ...args].join(" ").trim();
-    const commandIndex = this.history.length;
-
-    this.history.push({
-      isCommand: true,
-      exitCode: 0,
-      content: commandContent,
-    });
-    this.notify();
-
-    const echo = (line: string) => {
-      this.history.push({
-        isCommand: false,
-        exitCode: 0,
-        content: line,
-      });
-      this.echo(line);
-      this.notify();
-    };
-
-    const finalizeCommand = (exitCode: number) => {
-      this.history[commandIndex] = {
-        ...this.history[commandIndex],
-        exitCode,
-      };
-      this.notify();
-
-      return exitCode;
-    };
 
     const shellCommand = shellCommands[normalizedCommand];
 
     if (!shellCommand) {
       const failMessage = `'${command}': command not found`;
-      echo(failMessage);
-      return finalizeCommand(1);
+      this.appendHistory({
+        isCommand: true,
+        exitCode: 1,
+        content: commandContent,
+      });
+      this.appendHistory({
+        isCommand: false,
+        exitCode: 1,
+        content: failMessage,
+      });
+      this.echo(failMessage);
+      return 1;
     }
+
+    this.appendHistory({
+      isCommand: true,
+      exitCode: 0,
+      content: commandContent,
+    });
+
+    const echo = (line: string) => {
+      this.appendHistory({
+        isCommand: false,
+        exitCode: 0,
+        content: line,
+      });
+      this.echo(line);
+    };
 
     const exitCode = shellCommand(args, echo);
 
     if (exitCode instanceof Promise) {
       return exitCode
-        .then((resolvedExitCode) => finalizeCommand(resolvedExitCode))
+        .then((resolvedExitCode) => resolvedExitCode)
         .catch((error) => {
           const errorMessage = error instanceof Error ? error.message : "Command failed";
-          this.history.push({
+          this.appendHistory({
             isCommand: false,
             exitCode: 1,
             content: errorMessage,
           });
           this.echo(errorMessage);
-          this.notify();
 
-          return finalizeCommand(1);
+          return 1;
         });
     }
 
-    return finalizeCommand(exitCode);
+    return exitCode;
   }
 
   getCwd(): string {
@@ -165,10 +184,10 @@ export class PortfolioShell implements Shell {
 
   clearHistory(): void {
     this.history = [];
-    this.notify();
+    this.notify({ type: "write" });
   }
 
-  subscribe(listener: () => void): () => void {
+  subscribe(listener: (event: ShellEvent) => void): () => void {
     this.listeners.add(listener);
 
     return () => {
@@ -176,7 +195,12 @@ export class PortfolioShell implements Shell {
     };
   }
 
-  private notify(): void {
-    this.listeners.forEach((listener) => listener());
+  private appendHistory(line: ShellHistoryLine): void {
+    this.history.push(line);
+    this.notify({ type: "append", lines: [line] });
+  }
+
+  private notify(event: ShellEvent): void {
+    this.listeners.forEach((listener) => listener(event));
   }
 }
