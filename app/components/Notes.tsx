@@ -1,37 +1,36 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-export function Notes() {
+type Props = {
+  markdown: string;
+};
+
+export function Notes({ markdown }: Props) {
   return (
     <div className="w-full h-full bg-slate-800">
       <ScrollArea className="w-full h-full p-1">
-        <div>
-          <div className="mb-6">
-            <h1 className="text-lg font-bold">Who am I?</h1>
-            <p>I{"'"}m a 21 year old college student with a passion for technology.</p>
-          </div>
-          <div className="mb-6">
-            <h1 className="text-lg font-bold">Goals?</h1>
-            <p>As I enter the workforce, my main hope is to have an impact.
-              I want to contribute to a project that affects someone{"'"}s daily life,
-              as that is what will motivate me to do my best.</p>
-          </div>
-          <div className="mb-6">
-            <h1 className="text-lg font-bold">Hobbies?</h1>
-            <ul>
-              <li className="list-disc list-inside ms-2">
-                Golfer, Snowboarder/Skier, Runner
-              </li>
-              <li className="list-disc list-inside ms-2">
-                Fraternity Risk Manager, Website Coordinator, Professional Development Lead
-              </li>
-              <li className="list-disc list-inside ms-2">
-                Lacrosse player, Football player, and Cross Country runner
-              </li>
-              <li className="list-disc list-inside ms-2">
-                Lifelong Learner and Problem Solver,
-              </li>
-            </ul>
-          </div>
+        <div className="space-y-6">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              h1: ({ children }) => <h1 className="text-lg font-bold mb-1">{children}</h1>,
+              h2: ({ children }) => <h2 className="text-lg font-bold mb-1">{children}</h2>,
+              p: ({ children }) => <p className="leading-relaxed">{children}</p>,
+              ul: ({ children }) => <ul className="space-y-1">{children}</ul>,
+              li: ({ children }) => <li className="list-disc list-inside ms-2">{children}</li>,
+              a: ({ href, children }) => (
+                <a href={href} className="underline text-blue-300" target="_blank" rel="noreferrer">
+                  {children}
+                </a>
+              ),
+              code: ({ children }) => (
+                <code className="bg-slate-700 px-1 rounded text-sm">{children}</code>
+              ),
+            }}
+          >
+            {markdown}
+          </ReactMarkdown>
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>

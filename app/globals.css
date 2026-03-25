@@ -24,7 +24,7 @@ p {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "GeistVF";
+  font-family: var(--font-ui), "Segoe UI", "Helvetica Neue", sans-serif;
   font-style: normal;
   font-weight: 400;
 }

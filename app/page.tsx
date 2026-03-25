@@ -18,10 +18,38 @@ export default function Home() {
     { command: "help", args: [] },
   ];
 
+  const aboutMeNotes = `# Who am I?
+
+I'm a 21 year old college student with a passion for technology.
+
+# Goals?
+
+As I enter the workforce, my main hope is to have an impact. I want to contribute to a project that affects someone's daily life, as that is what will motivate me to do my best.
+
+# Hobbies?
+
+- Golfer, Snowboarder/Skier, Runner
+- Fraternity Risk Manager, Website Coordinator, Professional Development Lead
+- Lacrosse player, Football player, and Cross Country runner
+- Lifelong Learner and Problem Solver
+`;
+
+  const aboutPageNotes = `# Why is this page like this?
+
+I don't love UI dev, but I do love solving interesting problems. Creating a desktop environment with a functional terminal, an app I live in, felt interesting enough to make.`
+
   return (
     <main className="w-screen h-screen overflow-hidden">
       <BackgroundImage />
       <WindowManager>
+        <Window
+          title="Notes"
+          dimensions={{ width: "25%", height: "25%", defaultMax: false }}
+          position={{ top: "60%", left: "60%" }}
+          index={4}
+        >
+          <Notes markdown={aboutPageNotes} />
+        </Window>
         <Window
           title="Terminal"
           dimensions={{ width: "48%", height: "70%", defaultMax: false }}
@@ -36,7 +64,7 @@ export default function Home() {
           position={{ top: "8%", left: "3%" }}
           index={1}
         >
-          <Notes />
+          <Notes markdown={aboutMeNotes} />
         </Window>
         <Window
           title="Image"

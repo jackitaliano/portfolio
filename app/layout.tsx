@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -11,6 +12,12 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
+});
+
+const sourceSans3 = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-ui",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${sourceSans3.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
       </body>

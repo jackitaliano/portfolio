@@ -124,7 +124,6 @@ function buildRenderLines(history: ShellHistoryLine[]): RenderLine[] {
 }
 
 export function Terminal({ shell, startupCommands = [] }: Props) {
-  console.log("rendering terminal")
   const shellRef = useRef<Shell | null>(null);
 
   if (!shellRef.current) {
