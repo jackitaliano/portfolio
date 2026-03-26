@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Path } from "./Path";
-import "../css/animations.css";
+import "@/app/css/animations.css";
 
 type Props = {
   path: string;

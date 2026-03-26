@@ -1,12 +1,9 @@
 "use client";
 
 import { BackgroundImage } from './components';
-import { Image as ProfileImage } from './components/Image';
-import { Notes } from './components/Notes';
-import { Terminal } from './components/Terminal';
-import { Window } from './components/Window';
-import { WindowManager } from './components/WindowManager';
-import { PortfolioShell } from './shell/portfolioShell';
+import { Terminal, Notes, Image } from './apps';
+import { Window, WindowManager } from './gui';
+import { PortfolioShell } from './apps/terminal/shell';
 
 
 export default function Home() {
@@ -71,37 +68,9 @@ For now, I've entirely ignored mobile, because I've yet to decide how that would
           position={{ top: "9%", left: "80%" }}
           index={0}
         >
-          <ProfileImage imageSrc="/static/images/headshot.jpeg" />
+          <Image imageSrc="/static/images/headshot.jpeg" />
         </Window>
       </WindowManager>
     </main>
   );
 }
-
-{/* <Page id="info"> */ }
-{/*   <FadeIn> */ }
-{/*     <div className="w-full h-full flex flex-col"> */ }
-{/*       <Info /> */ }
-{/*       <div className="mt-auto flex justify-center animated fade-in delay-5"> */ }
-{/*         <MoreButton scrollId="experience" /> */ }
-{/*       </div> */ }
-{/*     </div> */ }
-{/*   </FadeIn> */ }
-{/* </Page> */ }
-{/* <Page id="experience"> */ }
-{/*   <FadeIn> */ }
-{/*     <div className="w-full h-full flex flex-col"> */ }
-{/*       <Experience /> */ }
-{/*       <div className="mt-auto flex justify-center"> */ }
-{/*         <MoreButton scrollId="projects" /> */ }
-{/*       </div> */ }
-{/*     </div> */ }
-{/*   </FadeIn> */ }
-{/* </Page> */ }
-{/* <Page id="projects"> */ }
-{/*   <FadeIn> */ }
-{/*     <div className="w-full h-full flex flex-col"> */ }
-{/*       <h1>Projects</h1> */ }
-{/*     </div> */ }
-{/*   </FadeIn> */ }
-{/* </Page> */ }

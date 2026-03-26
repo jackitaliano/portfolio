@@ -1,7 +1,7 @@
 "use client";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Shell, ShellClass, ShellEvent, ShellGitInfo, ShellHistoryLine } from "../shell/portfolioShell";
+import { Shell, ShellClass, ShellEvent, ShellGitInfo, ShellHistoryLine } from "./shell";
 import { Cmd, CmdArgs, CmdFail, CmdSuccess } from "./Cmd";
 import { CmdLine } from "./CmdLine";
 import { InputLine } from "./InputLine";
