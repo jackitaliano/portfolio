@@ -14,24 +14,21 @@ export default function Home() {
     { command: "help", args: [] },
   ];
 
-  const aboutMeNotes = `# About Me
+  const linkNotes = `# Links
 
-I'm a 23 year old Software Engineer, currently working at State Farm.
-
-# Goals
-
-Having just graduated college and starting work with State Farm, my primary goal is to learn as much as I can to become the best engineer I can.
+- [LinkedIn](https://linkedin.com/in/jackitaliano)
+- [GitHub](https://github.com/jackitaliano)
 `;
 
-  const aboutPageNotes = `# Why is this page like this?
+  const aboutPageNotes = `# About This Page
 
 I don't love Web dev, but I do love solving interesting problems. 
 
-Creating a desktop environment with a functional terminal, an app I live in, felt interesting enough to make.
+Creating a desktop environment with an interactive terminal, an app I live in, felt interesting enough to make.
 
 The windows are fully functional, and the terminal has a "shell" behind it. Try entering a command found in \`help\`.
 
-For now, I've entirely ignored mobile, because I've yet to decide how that would work with this idea.
+*For now, I've entirely ignored mobile, because I've yet to decide how that would work with this idea.*
 `
 
   return (
@@ -42,7 +39,7 @@ For now, I've entirely ignored mobile, because I've yet to decide how that would
           title="Notes"
           dimensions={{ width: "25%", height: "55%", defaultMax: false }}
           position={{ top: "8%", left: "3%" }}
-          index={4}
+          index={3}
         >
           <Notes markdown={aboutPageNotes} />
         </Window>
@@ -56,11 +53,11 @@ For now, I've entirely ignored mobile, because I've yet to decide how that would
         </Window>
         <Window
           title="Notes"
-          dimensions={{ width: "25%", height: "40%", defaultMax: false }}
-          position={{ top: "60%", left: "70%" }}
+          dimensions={{ width: "10%", height: "20%", defaultMax: false }}
+          position={{ top: "75%", left: "85%" }}
           index={1}
         >
-          <Notes markdown={aboutMeNotes} />
+          <Notes markdown={linkNotes} />
         </Window>
         <Window
           title="Image"

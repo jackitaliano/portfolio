@@ -271,8 +271,9 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
     async function runStartupCommands() {
       for (const startupCommand of startupCommands) {
         const startupInput = [startupCommand.command, ...startupCommand.args].join(" ").trim();
-        await typeOnInputLine(startupInput, 100);
+        await typeOnInputLine(startupInput, 50);
         await runCommand(startupCommand.command, startupCommand.args);
+        await delay(500);
       }
 
       setInputFocusSignal((prev) => prev + 1);
