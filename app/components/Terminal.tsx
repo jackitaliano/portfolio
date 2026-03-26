@@ -36,6 +36,10 @@ function decodeEscapedText(text: string): string {
     .replace(/\\r/g, "\r");
 }
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 type RenderLine = {
   kind: "command" | "output";
   key: string;
@@ -133,8 +137,25 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   const [shellUiState, setShellUiState] = useState<ShellUiState>(() => readShellUiState(shellRef.current as Shell));
   const [renderLines, setRenderLines] = useState<RenderLine[]>(() => buildRenderLines((shellRef.current as Shell).getHistory()));
   const [activeCommandCount, setActiveCommandCount] = useState(0);
+  const [typingText, setTypingText] = useState<string | undefined>(undefined);
+  const [isTypingStartup, setIsTypingStartup] = useState(false);
+  const [inputFocusSignal, setInputFocusSignal] = useState(0);
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const hasRunStartup = useRef(false);
+
+  const typeOnInputLine = useCallback(async (text: string, characterDelayMs = 30) => {
+    setIsTypingStartup(true);
+    setTypingText("");
+
+    for (let i = 0; i < text.length; i++) {
+      setTypingText((prev) => `${prev ?? ""}${text[i]}`);
+      await delay(characterDelayMs);
+    }
+
+    await delay(120);
+    setTypingText(undefined);
+    setIsTypingStartup(false);
+  }, []);
 
   const runCommand = useCallback(async (command: string, args: string[]) => {
     if (!shellRef.current) {
@@ -249,12 +270,16 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
 
     async function runStartupCommands() {
       for (const startupCommand of startupCommands) {
+        const startupInput = [startupCommand.command, ...startupCommand.args].join(" ").trim();
+        await typeOnInputLine(startupInput, 100);
         await runCommand(startupCommand.command, startupCommand.args);
       }
+
+      setInputFocusSignal((prev) => prev + 1);
     }
 
     void runStartupCommands();
-  }, [runCommand, startupCommands]);
+  }, [runCommand, startupCommands, typeOnInputLine]);
 
   return (
     <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
@@ -274,7 +299,16 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
           </div>
         )
       })}
-      {activeCommandCount === 0 ? <InputLine path={shellUiState.cwd} git={shellUiState.gitInfo} submit={executeText} /> : null}
+      {activeCommandCount === 0 || isTypingStartup ? (
+        <InputLine
+          path={shellUiState.cwd}
+          git={shellUiState.gitInfo}
+          submit={executeText}
+          valueOverride={typingText}
+          isLocked={isTypingStartup}
+          focusSignal={inputFocusSignal}
+        />
+      ) : null}
       <div ref={scrollRef} ></div>
       <ScrollBar orientation="vertical" />
     </ScrollArea>
