@@ -5,6 +5,10 @@ import { ReactNode, useRef, useEffect } from "react";
 type Dimensions = {
   width: string;
   height: string;
+  minWidth?: string;
+  minHeight?: string;
+  maxWidth?: string;
+  maxHeight?: string;
   defaultMax?: boolean;
 }
 
@@ -38,7 +42,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   };
   const windowRef = useRef<HTMLDivElement>(null);
 
-  if (typeof dimensions?.defaultMax === undefined) {
+  if (typeof dimensions?.defaultMax === "undefined") {
     dimensions.defaultMax = false;
   }
 
@@ -56,8 +60,11 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
 
   const style = {
     width: dimensions.width,
-    minWidth: "180px",
+    minWidth: dimensions.minWidth ?? "min(var(--wm-window-min-w), var(--wm-window-max-w))",
+    maxWidth: dimensions.maxWidth ?? "var(--wm-window-max-w)",
     height: dimensions.height,
+    minHeight: dimensions.minHeight ?? "min(var(--wm-window-min-h), var(--wm-window-max-h))",
+    maxHeight: dimensions.maxHeight ?? "var(--wm-window-max-h)",
     top: position.top,
     left: position.left,
     zIndex: index,
@@ -80,7 +87,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
 
   // TODO: make resizable and moveable
   function enableMoving(e: MouseEvent) {
-    if (typeof window === undefined) {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -188,8 +195,8 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     if (!windowRef?.current) {
       return;
     }
-    windowRef.current.style.width = "100%";
-    windowRef.current.style.height = "100%";
+    windowRef.current.style.width = "100dvw";
+    windowRef.current.style.height = "100dvh";
     windowRef.current.style.top = "0";
     windowRef.current.style.left = "0";
   }
@@ -237,7 +244,6 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   let touching = false;
 
   function onTouchStart(e: TouchEvent, callback: MouseEventCallback) {
-    console.log("touchstart")
     if (touching) {
       return;
     }
@@ -294,7 +300,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     touching = false;
   }
   useEffect(() => {
-    if (typeof window === undefined) {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -318,19 +324,19 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   return (
       <div ref={windowRef}
       style={style}
-      className={`absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.25)] text-slate-200 ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
+      className={`absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[var(--wm-window-shadow)] text-slate-200 ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
       onMouseDown={() => windowCtx.enterCallback(setZIndex)}
     >
-      <div className="select-none w-full h-7 bg-[#353738] border-b border-[#444547] py-auto flex ">
-        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#ff3c36] my-auto mx-1"></button>
-        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#ffc500] my-auto mx-1"></button>
-        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#00c41e] my-auto mx-1" onMouseUp={toggleWindowSize}></button>
+      <div className="select-none w-full h-[var(--wm-titlebar-h)] bg-[#353738] border-b border-[#444547] flex items-center">
+        <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#ff3c36] mx-[var(--wm-traffic-gap)]"></button>
+        <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#ffc500] mx-[var(--wm-traffic-gap)]"></button>
+        <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#00c41e] mx-[var(--wm-traffic-gap)]" onMouseUp={toggleWindowSize}></button>
         <div className="z-10 w-full h-full cursor-grab active:cursor-grabbing" onMouseDown={(e: React.MouseEvent) => enableMoving(e.nativeEvent)}
           onTouchStart={(e: React.TouchEvent) => onTouchStart(e.nativeEvent, enableMoving)}>
         </div>
-        <p className="z-0 absolute inset-x-0 px-16 text-center truncate whitespace-nowrap overflow-hidden pointer-events-none">{title}</p>
+        <p className="z-0 absolute inset-x-0 px-[var(--wm-title-pad-x)] text-center truncate whitespace-nowrap overflow-hidden pointer-events-none">{title}</p>
       </div>
-      <Card className="w-full h-full bg-slate-900 rounded-none border-0 shadow-none text-slate-250 bg-opacity-40 overflow-hidden">
+      <Card className="w-full h-full bg-slate-900 rounded-none border-0 shadow-none text-slate-200 bg-opacity-40 overflow-hidden">
         {children}
       </Card>
     </div>

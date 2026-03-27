@@ -62,6 +62,35 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    --wm-window-gutter: clamp(0.5rem, 1.6vw, 1.25rem);
+    --wm-window-max-w: calc(100dvw - var(--wm-window-gutter) - var(--wm-window-gutter));
+    --wm-window-max-h: calc(100dvh - var(--wm-window-gutter) - var(--wm-window-gutter));
+    --wm-window-min-w: 14rem;
+    --wm-window-min-h: 12rem;
+
+    --wm-titlebar-h: clamp(1.1rem, 0.95vw + 0.75rem, 2.4rem);
+    --wm-traffic-size: clamp(0.45rem, 0.5vw + 0.3rem, 1.08rem);
+    --wm-traffic-gap: clamp(0.2rem, 0.25vw + 0.15rem, 0.35rem);
+    --wm-title-pad-x: clamp(3.25rem, 9vw, 4.25rem);
+    --wm-window-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+
+    --wm-app-pad: clamp(0.25rem, 0.65vw, 0.5rem);
+    --wm-terminal-font-size: clamp(0.6rem, 0.55vw + 0.4rem, 1.15rem);
+    --wm-terminal-row-h: clamp(0.95rem, 0.8vw + 0.65rem, 2.05rem);
+
+    --wm-notes-font-size: clamp(0.66rem, 0.5vw + 0.48rem, 1.28rem);
+    --wm-notes-h1-size: clamp(0.82rem, 1.1vw + 0.45rem, 1.82rem);
+    --wm-notes-h2-size: clamp(0.78rem, 0.9vw + 0.42rem, 1.55rem);
+    --wm-notes-section-gap: clamp(1rem, 1.5vh + 0.5rem, 1.5rem);
+
+    --wm-window-notes-w: min(var(--wm-window-max-w), clamp(11.5rem, 28vw, 46rem));
+    --wm-window-notes-h: min(var(--wm-window-max-h), clamp(9rem, 68vh, 50rem));
+    --wm-window-terminal-w: min(var(--wm-window-max-w), clamp(13.5rem, 50vw, 82rem));
+    --wm-window-terminal-h: min(var(--wm-window-max-h), clamp(10.5rem, 72vh, 64rem));
+    --wm-window-links-w: min(var(--wm-window-max-w), clamp(9rem, 20vw, 34rem));
+    --wm-window-links-h: min(var(--wm-window-max-h), clamp(7rem, 28vh, 32rem));
+    --wm-window-image-size: min(var(--wm-window-max-w), clamp(5rem, 16vw, 18rem));
   }
 
   .dark {
@@ -99,5 +128,18 @@ body {
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --wm-window-gutter: 0.5rem;
+    --wm-window-terminal-w: var(--wm-window-max-w);
+    --wm-window-terminal-h: min(var(--wm-window-max-h), clamp(12rem, 78vh, 46rem));
+    --wm-window-notes-w: var(--wm-window-max-w);
+    --wm-window-notes-h: min(var(--wm-window-max-h), clamp(9.5rem, 70vh, 44rem));
+    --wm-window-links-w: min(var(--wm-window-max-w), clamp(8.5rem, 80vw, 24rem));
+    --wm-window-links-h: min(var(--wm-window-max-h), clamp(6.5rem, 45vh, 24rem));
+    --wm-window-image-size: clamp(4.5rem, 22vw, 10rem);
   }
 }

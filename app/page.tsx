@@ -14,12 +14,6 @@ export default function Home() {
     { command: "help", args: [] },
   ];
 
-  const linkNotes = `# Links
-
-- [LinkedIn](https://linkedin.com/in/jackitaliano)
-- [GitHub](https://github.com/jackitaliano)
-`;
-
   const aboutPageNotes = `# About This Page
 
 I don't love Web dev, but I do love solving interesting problems. 
@@ -29,40 +23,38 @@ Creating a desktop environment with an interactive terminal, an app I live in, f
 The windows are fully functional, and the terminal has a "shell" behind it. Try entering a command found in \`help\`.
 
 *For now, I've entirely ignored mobile, because I've yet to decide how that would work with this idea.*
+
+# Links
+
+- [LinkedIn](https://linkedin.com/in/jackitaliano)
+- [GitHub](https://github.com/jackitaliano)
 `
 
   return (
-    <main className="w-screen h-screen overflow-hidden">
+    <main className="w-[100dvw] h-[100dvh] overflow-hidden">
       <BackgroundImage />
+      <p>{window.innerWidth}:{window.innerHeight}</p>
       <WindowManager>
         <Window
           title="Notes"
-          dimensions={{ width: "25%", height: "55%", defaultMax: false }}
-          position={{ top: "8%", left: "3%" }}
-          index={3}
+          dimensions={{ width: "var(--wm-window-notes-w)", height: "var(--wm-window-notes-h)", defaultMax: false }}
+          position={{ top: "6%", left: "1%" }}
+          index={2}
         >
           <Notes markdown={aboutPageNotes} />
         </Window>
         <Window
           title="Terminal"
-          dimensions={{ width: "48%", height: "70%", defaultMax: false }}
+          dimensions={{ width: "var(--wm-window-terminal-w)", height: "var(--wm-window-terminal-h)", defaultMax: false }}
           position={{ top: "11%", left: "30%" }}
-          index={2}
+          index={1}
         >
           <Terminal shell={PortfolioShell} startupCommands={terminalStartupCommands} />
         </Window>
         <Window
-          title="Notes"
-          dimensions={{ width: "20%", height: "35%", defaultMax: false }}
-          position={{ top: "63%", left: "79%" }}
-          index={1}
-        >
-          <Notes markdown={linkNotes} />
-        </Window>
-        <Window
           title="Image"
-          dimensions={{ width: "200px", height: "200px", defaultMax: false }}
-          position={{ top: "9%", left: "80%" }}
+          dimensions={{ width: "var(--wm-window-image-size)", height: "var(--wm-window-image-size)", defaultMax: false }}
+          position={{ top: "9%", left: "82%" }}
           index={0}
         >
           <Image imageSrc="/static/images/headshot.jpeg" />

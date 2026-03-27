@@ -68,13 +68,13 @@ export function InputLine({ path, git, submit, valueOverride, isLocked = false, 
   }
 
   return (
-    <div className="w-full flex items-center h-5">
+    <div className="w-full flex items-center h-[var(--wm-terminal-row-h)] text-[length:var(--wm-terminal-font-size)] leading-[var(--wm-terminal-row-h)]">
       <div className="pe-2">
         <Path path={path} git={git} />
       </div>
       <div className="w-full relative inline-block">
-        <span className={`absolute z-0 whitespace-pre text-transparent ${isFocused ? "cursor" : "cursor-static"}`}>{displayText || " "}</span>
-        <textarea ref={textareaRef} className="block relative w-full z-10 h-5 bg-transparent m-0 p-0 resize-none \
+        <span className={`absolute z-0 whitespace-pre text-transparent leading-[var(--wm-terminal-row-h)] ${isFocused ? "cursor" : "cursor-static"}`}>{displayText || " "}</span>
+        <textarea ref={textareaRef} className="block relative w-full z-10 h-[var(--wm-terminal-row-h)] leading-[var(--wm-terminal-row-h)] bg-transparent m-0 p-0 resize-none \
         outline-none border-none shadow-none caret-transparent \
         focus:outline-none focus:border-none focus:shadow-none focus:caret-transparent \
         overflow-hidden"
