@@ -92,6 +92,9 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   const [windowStates, setWindowStates] = useState<Record<string, WindowState>>(() =>
     Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, buildInitialWindowState(appWindow)]))
   );
+  const [windowOpenState, setWindowOpenState] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, true]))
+  );
 
   function updateWindowState(appWindow: AppWindow, updater: WindowState | ((prev: WindowState) => WindowState)) {
     setWindowStates((prevStates) => {
@@ -111,11 +114,40 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
     setFocusToken((currentToken) => currentToken + 1);
   }
 
+  function closeApp(appId: string) {
+    setWindowOpenState((prev) => ({
+      ...prev,
+      [appId]: false,
+    }));
+  }
+
+  function openOrFocusApp(appWindow: AppWindow) {
+    const isOpen = windowOpenState[appWindow.id] ?? true;
+
+    if (!isOpen) {
+      setWindowStates((prev) => ({
+        ...prev,
+        [appWindow.id]: buildInitialWindowState(appWindow),
+      }));
+      setWindowOpenState((prev) => ({
+        ...prev,
+        [appWindow.id]: true,
+      }));
+    }
+
+    focusApp(appWindow.id);
+  }
+
   return (
     <main className="w-[100dvw] h-[100dvh] overflow-hidden">
       <BackgroundImage />
       <WindowManager>
         {appWindows.map((appWindow) => {
+          const isOpen = windowOpenState[appWindow.id] ?? true;
+          if (!isOpen) {
+            return null;
+          }
+
           const windowState = windowStates[appWindow.id] ?? buildInitialWindowState(appWindow);
 
           return (
@@ -127,6 +159,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
               index={windowState.zIndex}
               state={windowState}
               onStateChange={(updater) => updateWindowState(appWindow, updater)}
+              onClose={() => closeApp(appWindow.id)}
               onFocus={() => setFocusedAppId(appWindow.id)}
               requestFocusToken={requestedFocusId === appWindow.id ? focusToken : undefined}
             >
@@ -139,8 +172,8 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
         apps={appWindows.map((appWindow) => ({
           id: appWindow.id,
           title: appWindow.title,
-          isActive: focusedAppId === appWindow.id,
-          onClick: () => focusApp(appWindow.id),
+          isActive: (windowOpenState[appWindow.id] ?? true) && focusedAppId === appWindow.id,
+          onClick: () => openOrFocusApp(appWindow),
           icon: (
             <span className="flex h-7 w-7 items-center justify-center rounded-md border border-white/20 bg-zinc-800/60 text-sm font-semibold text-slate-100">
               {appWindow.title.charAt(0)}
