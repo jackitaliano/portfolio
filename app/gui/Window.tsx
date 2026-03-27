@@ -56,6 +56,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
 
   const style = {
     width: dimensions.width,
+    minWidth: "180px",
     height: dimensions.height,
     top: position.top,
     left: position.left,
@@ -317,19 +318,19 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   return (
       <div ref={windowRef}
       style={style}
-      className={`absolute flex flex-col ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
+      className={`absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[0_2px_4px_rgba(0,0,0,0.25)] text-slate-200 ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
       onMouseDown={() => windowCtx.enterCallback(setZIndex)}
     >
-      <div className="select-none w-full h-6 rounded-t-lg bg-slate-600 py-auto flex ">
-        <button className="w-[12px] h-[12px] rounded-full bg-red-700 my-auto mx-1"></button>
-        <button className="w-3 h-3 rounded-full bg-yellow-700 my-auto mx-1"></button>
-        <button className="w-3 h-3 rounded-full bg-green-700 my-auto mx-1" onMouseUp={toggleWindowSize}></button>
+      <div className="select-none w-full h-7 bg-[#353738] border-b border-[#444547] py-auto flex ">
+        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#ff3c36] my-auto mx-1"></button>
+        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#ffc500] my-auto mx-1"></button>
+        <button className="w-3 h-3 min-w-3 min-h-3 rounded-full shrink-0 bg-[#00c41e] my-auto mx-1" onMouseUp={toggleWindowSize}></button>
         <div className="z-10 w-full h-full cursor-grab active:cursor-grabbing" onMouseDown={(e: React.MouseEvent) => enableMoving(e.nativeEvent)}
           onTouchStart={(e: React.TouchEvent) => onTouchStart(e.nativeEvent, enableMoving)}>
         </div>
-        <p className="z-0 absolute w-min left-0 right-0 mx-auto">{title}</p>
+        <p className="z-0 absolute inset-x-0 px-16 text-center truncate whitespace-nowrap overflow-hidden pointer-events-none">{title}</p>
       </div>
-      <Card className="w-full h-full bg-slate-900 rounded-t-none border-slate-600 shadow-slate-500 text-white bg-opacity-40 overflow-hidden">
+      <Card className="w-full h-full bg-slate-900 rounded-none border-0 shadow-none text-slate-250 bg-opacity-40 overflow-hidden">
         {children}
       </Card>
     </div>

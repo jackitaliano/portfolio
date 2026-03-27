@@ -283,7 +283,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   }, [runCommand, startupCommands, typeOnInputLine]);
 
   return (
-    <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-slate-900 bg-opacity-80">
+    <ScrollArea className="z-50 w-full h-full p-1 text-sm font-[SpaceMono] bg-black bg-opacity-80">
 
       {renderLines.map((line) => {
         if (line.kind === "command") {

@@ -53,8 +53,8 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
         </Window>
         <Window
           title="Notes"
-          dimensions={{ width: "10%", height: "20%", defaultMax: false }}
-          position={{ top: "75%", left: "85%" }}
+          dimensions={{ width: "20%", height: "35%", defaultMax: false }}
+          position={{ top: "63%", left: "79%" }}
           index={1}
         >
           <Notes markdown={linkNotes} />
