@@ -27,6 +27,10 @@
   animation: blink-caret .7s step-end infinite;
 }
 
+.cursor-static {
+  border-right: 0.15em solid white;
+}
+
 /* The typing effect */
 @keyframes typing {
   0% {

@@ -18,7 +18,7 @@ type Props = {
 
 export function InputLine({ path, git, submit, valueOverride, isLocked = false, focusSignal = 0 }: Props) {
   const [text, setText] = useState("");
-  const spanRef = useRef<HTMLSpanElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isOverridden = typeof valueOverride === "string";
@@ -60,18 +60,11 @@ export function InputLine({ path, git, submit, valueOverride, isLocked = false, 
   }
 
   function stopBlinking() {
-    if (!spanRef?.current) {
-      return;
-    }
-
-    spanRef.current.style.opacity = "0.5";
+    setIsFocused(false);
   }
-  function startBlinking() {
-    if (!spanRef?.current) {
-      return;
-    }
 
-    spanRef.current.style.opacity = "1";
+  function startBlinking() {
+    setIsFocused(true);
   }
 
   return (
@@ -80,7 +73,7 @@ export function InputLine({ path, git, submit, valueOverride, isLocked = false, 
         <Path path={path} git={git} />
       </div>
       <div className="w-full relative inline-block">
-        <span ref={spanRef} className="absolute z-0 whitespace-pre cursor text-transparent">{displayText || " "}</span>
+        <span className={`absolute z-0 whitespace-pre text-transparent ${isFocused ? "cursor" : "cursor-static"}`}>{displayText || " "}</span>
         <textarea ref={textareaRef} className="block relative w-full z-10 h-5 bg-transparent m-0 p-0 resize-none \
         outline-none border-none shadow-none caret-transparent \
         focus:outline-none focus:border-none focus:shadow-none focus:caret-transparent \
