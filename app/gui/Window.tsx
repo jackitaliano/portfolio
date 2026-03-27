@@ -25,62 +25,76 @@ export type WindowContext = {
   enterCallback: ActionCallback;
 }
 
+const defaultWindowContext: WindowContext = {
+  enterCallback: () => { },
+};
+
 type Props = {
   title: string;
   dimensions: Dimensions;
   position: Position;
   index: number;
+  state: WindowState;
+  onStateChange: (updater: WindowState | ((prev: WindowState) => WindowState)) => void;
   ctx?: WindowContext;
+  onFocus?: () => void;
+  requestFocusToken?: number;
   children: ReactNode;
 }
 
 type MouseEventCallback = (e: MouseEvent) => void;
 
-export function Window({ title, dimensions, position, index, ctx, children }: Props) {
-  const windowCtx: WindowContext = ctx || {
-    enterCallback: () => { },
-  };
+export type WindowState = {
+  width: string;
+  height: string;
+  top: string;
+  left: string;
+  zIndex: number;
+  isMaximized: boolean;
+}
+
+export function Window({ title, dimensions, position, index, state, onStateChange, ctx, onFocus, requestFocusToken, children }: Props) {
+  const windowCtx: WindowContext = ctx ?? defaultWindowContext;
   const windowRef = useRef<HTMLDivElement>(null);
+  const lastFocusTokenRef = useRef<number>(-1);
+  const restoreStateRef = useRef<WindowState | null>(null);
 
   if (typeof dimensions?.defaultMax === "undefined") {
     dimensions.defaultMax = false;
   }
 
-  let zIndex = index;
-
-  let movingWindow = false;
-  let movingDisabled = false;
-  let windowWidth = 0;
-  let windowHeight = 0;
-  let screenWidth = 0;
-  let screenHeight = 0;
-  let mouseOffsetY = 0;
-  let mouseOffsetX = 0;
-  let maximized = dimensions.defaultMax;
+  const movingWindowRef = useRef(false);
+  const movingDisabledRef = useRef(false);
+  const windowWidthRef = useRef(0);
+  const windowHeightRef = useRef(0);
+  const screenWidthRef = useRef(0);
+  const screenHeightRef = useRef(0);
+  const mouseOffsetYRef = useRef(0);
+  const mouseOffsetXRef = useRef(0);
 
   const style = {
-    width: dimensions.width,
+    width: state.width,
     minWidth: dimensions.minWidth ?? "min(var(--wm-window-min-w), var(--wm-window-max-w))",
-    maxWidth: dimensions.maxWidth ?? "var(--wm-window-max-w)",
-    height: dimensions.height,
+    maxWidth: state.isMaximized ? "none" : dimensions.maxWidth ?? "var(--wm-window-max-w)",
+    height: state.height,
     minHeight: dimensions.minHeight ?? "min(var(--wm-window-min-h), var(--wm-window-max-h))",
-    maxHeight: dimensions.maxHeight ?? "var(--wm-window-max-h)",
-    top: position.top,
-    left: position.left,
-    zIndex: index,
+    maxHeight: state.isMaximized ? "none" : dimensions.maxHeight ?? "var(--wm-window-max-h)",
+    top: state.top,
+    left: state.left,
+    zIndex: state.zIndex ?? index,
   }
 
   // let resizingWindow = false;
 
-  let clicks = 0;
+  const clicksRef = useRef(0);
   const clickTimeout = 250;
 
   function incrementClicks() {
-    clicks += 1;
+    clicksRef.current += 1;
     setTimeout(() => {
-      clicks -= 1;
-      if (clicks < 0) {
-        clicks = 0;
+      clicksRef.current -= 1;
+      if (clicksRef.current < 0) {
+        clicksRef.current = 0;
       }
     }, clickTimeout)
   }
@@ -97,29 +111,29 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
 
     incrementClicks();
 
-    if (clicks >= 2) {
+    if (clicksRef.current >= 2) {
       toggleWindowSize();
     }
 
-    movingWindow = true;
+    movingWindowRef.current = true;
     const boundingRect = windowRef.current.getBoundingClientRect();
-    windowWidth = boundingRect.width;
-    windowHeight = boundingRect.height;
-    screenWidth = window.innerWidth;
-    screenHeight = window.innerHeight;
+    windowWidthRef.current = boundingRect.width;
+    windowHeightRef.current = boundingRect.height;
+    screenWidthRef.current = window.innerWidth;
+    screenHeightRef.current = window.innerHeight;
 
     const currTop = windowRef.current.offsetTop;
     const currLeft = windowRef.current.offsetLeft;
 
-    mouseOffsetY = e.clientY - currTop;
-    mouseOffsetX = e.clientX - currLeft;
+    mouseOffsetYRef.current = e.clientY - currTop;
+    mouseOffsetXRef.current = e.clientX - currLeft;
   }
 
   function moveWindow(e: MouseEvent) {
     if (!windowRef?.current) {
       return;
     }
-    if (!movingWindow || movingDisabled) {
+    if (!movingWindowRef.current || movingDisabledRef.current) {
       return;
     }
     e.preventDefault();
@@ -130,32 +144,35 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     const clientX = e.clientX;
     const clientY = e.clientY;
 
-    let newTop = clientY - mouseOffsetY;
-    let newLeft = clientX - mouseOffsetX;
+    let newTop = clientY - mouseOffsetYRef.current;
+    let newLeft = clientX - mouseOffsetXRef.current;
 
     if (newTop < 0) {
       newTop = 0;
-      mouseOffsetY = e.clientY - currTop;
+      mouseOffsetYRef.current = e.clientY - currTop;
     }
-    if (newTop > screenHeight - windowHeight) {
-      newTop = screenHeight - windowHeight;
-      mouseOffsetY = e.clientY - currTop;
+    if (newTop > screenHeightRef.current - windowHeightRef.current) {
+      newTop = screenHeightRef.current - windowHeightRef.current;
+      mouseOffsetYRef.current = e.clientY - currTop;
     }
     if (newLeft < 0) {
       newLeft = 0;
-      mouseOffsetX = e.clientX - currLeft;
+      mouseOffsetXRef.current = e.clientX - currLeft;
     }
-    if (newLeft > screenWidth - windowWidth) {
-      newLeft = screenWidth - windowWidth;
-      mouseOffsetX = e.clientX - currLeft;
+    if (newLeft > screenWidthRef.current - windowWidthRef.current) {
+      newLeft = screenWidthRef.current - windowWidthRef.current;
+      mouseOffsetXRef.current = e.clientX - currLeft;
     }
 
-    windowRef.current.style.top = newTop + "px";
-    windowRef.current.style.left = newLeft + "px";
+    onStateChange((prev) => ({
+      ...prev,
+      top: `${newTop}px`,
+      left: `${newLeft}px`,
+    }));
   }
 
   function disableMoving() {
-    movingWindow = false;
+    movingWindowRef.current = false;
   }
 
   function toggleWindowSize() {
@@ -164,45 +181,54 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     }
 
     windowRef.current.style.transition = "all 150ms ease";
-    movingDisabled = true;
-    clicks = 0;
+    movingDisabledRef.current = true;
+    clicksRef.current = 0;
     setTimeout(() => {
       if (!windowRef?.current) {
         return;
       }
       windowRef.current.style.transition = "";
-      movingDisabled = false;
+      movingDisabledRef.current = false;
     }, 150);
-    if (maximized) {
-      minimizeWindow();
-    } else {
-      maximizeWindow();
-    }
-    maximized = !maximized;
-  }
+    onStateChange((prev) => {
+      if (prev.isMaximized) {
+        const restoreState = restoreStateRef.current;
+        if (!restoreState) {
+          return {
+            ...prev,
+            width: dimensions.width,
+            height: dimensions.height,
+            top: position.top,
+            left: position.left,
+            isMaximized: false,
+          };
+        }
 
-  function minimizeWindow() {
-    if (!windowRef?.current) {
-      return;
-    }
-    windowRef.current.style.width = dimensions.width;
-    windowRef.current.style.height = dimensions.height;
-    windowRef.current.style.maxWidth = dimensions.maxWidth ?? "var(--wm-window-max-w)";
-    windowRef.current.style.maxHeight = dimensions.maxHeight ?? "var(--wm-window-max-h)";
-    windowRef.current.style.top = position.top;
-    windowRef.current.style.left = position.left;
-  }
+        restoreStateRef.current = null;
+        return {
+          ...prev,
+          width: restoreState.width,
+          height: restoreState.height,
+          top: restoreState.top,
+          left: restoreState.left,
+          isMaximized: false,
+        };
+      }
 
-  function maximizeWindow() {
-    if (!windowRef?.current) {
-      return;
-    }
-    windowRef.current.style.maxWidth = "none";
-    windowRef.current.style.maxHeight = "none";
-    windowRef.current.style.width = "100dvw";
-    windowRef.current.style.height = "100dvh";
-    windowRef.current.style.top = "0";
-    windowRef.current.style.left = "0";
+      restoreStateRef.current = {
+        ...prev,
+        isMaximized: false,
+      };
+
+      return {
+        ...prev,
+        width: "100dvw",
+        height: "100dvh",
+        top: "0",
+        left: "0",
+        isMaximized: true,
+      };
+    });
   }
 
   // function enableResize(e) {
@@ -243,23 +269,26 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   // }
   //
 
-  let prevTouch: Touch;
-  let firstTouch: Touch;
-  let touching = false;
+  const prevTouchRef = useRef<Touch | null>(null);
+  const touchingRef = useRef(false);
+  const moveWindowHandlerRef = useRef<MouseEventCallback>(() => { });
+  const disableMovingHandlerRef = useRef(() => { });
+  const touchMoveHandlerRef = useRef<(e: TouchEvent) => void>(() => { });
+  const touchEndHandlerRef = useRef(() => { });
 
   function onTouchStart(e: TouchEvent, callback: MouseEventCallback) {
-    if (touching) {
+    if (touchingRef.current) {
       return;
     }
 
-    touching = true;
-    firstTouch = e.touches[0];
-    prevTouch = firstTouch;
+    touchingRef.current = true;
+    const firstTouch = e.touches[0];
+    prevTouchRef.current = firstTouch;
 
     const clientX = firstTouch.clientX;
     const clientY = firstTouch.clientY;
-    const movementX = firstTouch.pageX - prevTouch.pageX;
-    const movementY = firstTouch.pageY - prevTouch.pageY;
+    const movementX = 0;
+    const movementY = 0;
 
     const mouseEvent = new MouseEvent('mousedown', {
       bubbles: true,
@@ -274,12 +303,16 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
   }
 
   function onTouchMove(e: TouchEvent, callback: MouseEventCallback) {
+    if (!prevTouchRef.current) {
+      return;
+    }
+
     const newTouch = e.touches[0];
 
     const clientX = newTouch.clientX;
     const clientY = newTouch.clientY;
-    const movementX = newTouch.pageX - prevTouch.pageX;
-    const movementY = newTouch.pageY - prevTouch.pageY;
+    const movementX = newTouch.pageX - prevTouchRef.current.pageX;
+    const movementY = newTouch.pageY - prevTouchRef.current.pageY;
 
     const mouseEvent = new MouseEvent('mousemove', {
       bubbles: true,
@@ -292,7 +325,7 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
 
     callback(mouseEvent);
 
-    prevTouch = newTouch;
+    prevTouchRef.current = newTouch;
   }
 
   function onTouchEnd(callback: MouseEventCallback) {
@@ -301,35 +334,71 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
       cancelable: true,
     })
     callback(mouseEvent);
-    touching = false;
+    touchingRef.current = false;
+    prevTouchRef.current = null;
   }
+
+  moveWindowHandlerRef.current = moveWindow;
+  disableMovingHandlerRef.current = disableMoving;
+  touchMoveHandlerRef.current = (e: TouchEvent) => onTouchMove(e, moveWindowHandlerRef.current);
+  touchEndHandlerRef.current = () => onTouchEnd(disableMovingHandlerRef.current);
+
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    window.addEventListener("mouseup", disableMoving);
-    window.addEventListener("mouseleave", disableMoving);
-    window.addEventListener("mousemove", moveWindow);
-    window.addEventListener("touchend", () => onTouchEnd(disableMoving));
-    window.addEventListener("touchcancel", () => onTouchEnd(disableMoving));
-    window.addEventListener("touchmove", (e) => onTouchMove(e, moveWindow));
+    const handleMouseUp = () => disableMovingHandlerRef.current();
+    const handleMouseLeave = () => disableMovingHandlerRef.current();
+    const handleMouseMove = (e: MouseEvent) => moveWindowHandlerRef.current(e);
+    const handleTouchEnd = () => touchEndHandlerRef.current();
+    const handleTouchMove = (e: TouchEvent) => touchMoveHandlerRef.current(e);
+
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchcancel", handleTouchEnd);
+    window.addEventListener("touchmove", handleTouchMove);
+
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
   }, []);
 
   function setZIndex(index: number) {
-    if (!windowRef?.current) {
+    onStateChange((prev) => ({ ...prev, zIndex: index }));
+  }
+
+  function handleWindowMouseDown() {
+    windowCtx.enterCallback(setZIndex);
+    onFocus?.();
+  }
+
+  useEffect(() => {
+    if (typeof requestFocusToken !== "number") {
       return;
     }
 
-    zIndex = index;
-    windowRef.current.style.zIndex = zIndex + "";
-  }
+    if (requestFocusToken === lastFocusTokenRef.current) {
+      return;
+    }
+
+    lastFocusTokenRef.current = requestFocusToken;
+    windowCtx.enterCallback((nextIndex) => onStateChange((prev) => ({ ...prev, zIndex: nextIndex })));
+    onFocus?.();
+  }, [requestFocusToken, windowCtx, onFocus, onStateChange]);
 
   return (
       <div ref={windowRef}
       style={style}
-      className={`absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[var(--wm-window-shadow)] text-slate-200 ${maximized ? 'w-full h-full left-0 top-0' : ""}`}
-      onMouseDown={() => windowCtx.enterCallback(setZIndex)}
+      className="absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[var(--wm-window-shadow)] text-slate-200"
+      onMouseDown={handleWindowMouseDown}
     >
       <div className="select-none w-full h-[var(--wm-titlebar-h)] bg-[#353738] border-b border-[#444547] flex items-center">
         <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#ff3c36] mx-[var(--wm-traffic-gap)]"></button>
