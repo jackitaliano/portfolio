@@ -8,7 +8,7 @@ type Props = {
 
 export function Notes({ markdown }: Props) {
   return (
-    <div className="w-full h-full bg-[#222325]">
+    <div className="w-full h-full bg-[#131414]">
       <ScrollArea className="w-full h-full p-[var(--wm-app-pad)]">
         <div className="space-y-[var(--wm-notes-section-gap)] text-[length:var(--wm-notes-font-size)]">
           <ReactMarkdown

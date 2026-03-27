@@ -283,7 +283,7 @@ export function Terminal({ shell, startupCommands = [] }: Props) {
   }, [runCommand, startupCommands, typeOnInputLine]);
 
   return (
-    <ScrollArea className="z-50 w-full h-full p-[var(--wm-app-pad)] text-[length:var(--wm-terminal-font-size)] font-[SpaceMono] bg-black bg-opacity-80">
+    <ScrollArea className="z-50 w-full h-full p-[var(--wm-app-pad)] text-[length:var(--wm-terminal-font-size)] font-[SpaceMono] bg-black">
 
       {renderLines.map((line) => {
         if (line.kind === "command") {

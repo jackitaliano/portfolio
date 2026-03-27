@@ -187,6 +187,8 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     }
     windowRef.current.style.width = dimensions.width;
     windowRef.current.style.height = dimensions.height;
+    windowRef.current.style.maxWidth = dimensions.maxWidth ?? "var(--wm-window-max-w)";
+    windowRef.current.style.maxHeight = dimensions.maxHeight ?? "var(--wm-window-max-h)";
     windowRef.current.style.top = position.top;
     windowRef.current.style.left = position.left;
   }
@@ -195,6 +197,8 @@ export function Window({ title, dimensions, position, index, ctx, children }: Pr
     if (!windowRef?.current) {
       return;
     }
+    windowRef.current.style.maxWidth = "none";
+    windowRef.current.style.maxHeight = "none";
     windowRef.current.style.width = "100dvw";
     windowRef.current.style.height = "100dvh";
     windowRef.current.style.top = "0";

@@ -10,7 +10,7 @@ export default function Home() {
   const terminalStartupCommands = [
     { command: "whois", args: [] },
     { command: "contact", args: [] },
-    { command: "experience", args: ["-s"] },
+    { command: "experience", args: [] },
     { command: "help", args: [] },
   ];
 
@@ -46,7 +46,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
         <Window
           title="Terminal"
           dimensions={{ width: "var(--wm-window-terminal-w)", height: "var(--wm-window-terminal-h)", defaultMax: false }}
-          position={{ top: "11%", left: "30%" }}
+          position={{ top: "11%", left: "31%" }}
           index={1}
         >
           <Terminal shell={PortfolioShell} startupCommands={terminalStartupCommands} />

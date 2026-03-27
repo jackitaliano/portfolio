@@ -87,7 +87,7 @@ body {
     --wm-window-notes-w: min(var(--wm-window-max-w), clamp(11.5rem, 28vw, 46rem));
     --wm-window-notes-h: min(var(--wm-window-max-h), clamp(9rem, 68vh, 50rem));
     --wm-window-terminal-w: min(var(--wm-window-max-w), clamp(13.5rem, 50vw, 82rem));
-    --wm-window-terminal-h: min(var(--wm-window-max-h), clamp(10.5rem, 72vh, 64rem));
+    --wm-window-terminal-h: min(var(--wm-window-max-h), clamp(10.5rem, 74vh, 66rem));
     --wm-window-links-w: min(var(--wm-window-max-w), clamp(9rem, 20vw, 34rem));
     --wm-window-links-h: min(var(--wm-window-max-h), clamp(7rem, 28vh, 32rem));
     --wm-window-image-size: min(var(--wm-window-max-w), clamp(5rem, 16vw, 18rem));
