@@ -33,7 +33,6 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   return (
     <main className="w-[100dvw] h-[100dvh] overflow-hidden">
       <BackgroundImage />
-      <p>{window.innerWidth}:{window.innerHeight}</p>
       <WindowManager>
         <Window
           title="Notes"
