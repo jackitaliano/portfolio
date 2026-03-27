@@ -37,6 +37,8 @@ type MinimizeAnimation = {
   active: boolean;
 };
 
+type WindowLifecycleState = 'open' | 'minimized' | 'closed';
+
 const MINIMIZE_ANIMATION_MS = 260;
 
 function buildInitialWindowState(appWindow: AppWindow): WindowState {
@@ -108,8 +110,8 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   const [windowStates, setWindowStates] = useState<Record<string, WindowState>>(() =>
     Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, buildInitialWindowState(appWindow)]))
   );
-  const [windowOpenState, setWindowOpenState] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, true]))
+  const [windowLifecycleState, setWindowLifecycleState] = useState<Record<string, WindowLifecycleState>>(() =>
+    Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, 'open']))
   );
   const [minimizeAnimation, setMinimizeAnimation] = useState<MinimizeAnimation | null>(null);
   const dockIconRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -147,23 +149,26 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   }
 
   function closeApp(appId: string) {
-    setWindowOpenState((prev) => ({
+    setWindowLifecycleState((prev) => ({
       ...prev,
-      [appId]: false,
+      [appId]: 'closed',
     }));
   }
 
   function openOrFocusApp(appWindow: AppWindow) {
-    const isOpen = windowOpenState[appWindow.id] ?? true;
+    const lifecycleState = windowLifecycleState[appWindow.id] ?? 'open';
 
-    if (!isOpen) {
+    if (lifecycleState === 'closed') {
       setWindowStates((prev) => ({
         ...prev,
         [appWindow.id]: buildInitialWindowState(appWindow),
       }));
-      setWindowOpenState((prev) => ({
+    }
+
+    if (lifecycleState !== 'open') {
+      setWindowLifecycleState((prev) => ({
         ...prev,
-        [appWindow.id]: true,
+        [appWindow.id]: 'open',
       }));
     }
 
@@ -171,7 +176,10 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   }
 
   function minimizeApp(appWindow: AppWindow, windowRect: DOMRect) {
-    closeApp(appWindow.id);
+    setWindowLifecycleState((prev) => ({
+      ...prev,
+      [appWindow.id]: 'minimized',
+    }));
 
     const targetElement = dockIconRefs.current[appWindow.id];
     if (!targetElement) {
@@ -209,8 +217,8 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
       <BackgroundImage />
       <WindowManager>
         {appWindows.map((appWindow) => {
-          const isOpen = windowOpenState[appWindow.id] ?? true;
-          if (!isOpen) {
+          const lifecycleState = windowLifecycleState[appWindow.id] ?? 'open';
+          if (lifecycleState === 'closed') {
             return null;
           }
 
@@ -227,6 +235,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
               onStateChange={(updater) => updateWindowState(appWindow, updater)}
               onClose={() => closeApp(appWindow.id)}
               onMinimize={(windowRect) => minimizeApp(appWindow, windowRect)}
+              isVisible={lifecycleState === 'open'}
               onFocus={() => setFocusedAppId(appWindow.id)}
               requestFocusToken={requestedFocusId === appWindow.id ? focusToken : undefined}
             >
@@ -239,7 +248,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
         apps={appWindows.map((appWindow) => ({
           id: appWindow.id,
           title: appWindow.title,
-          isActive: (windowOpenState[appWindow.id] ?? true) && focusedAppId === appWindow.id,
+          isActive: (windowLifecycleState[appWindow.id] ?? 'open') === 'open' && focusedAppId === appWindow.id,
           onClick: () => openOrFocusApp(appWindow),
           buttonRef: (element) => setDockIconRef(appWindow.id, element),
           icon: (

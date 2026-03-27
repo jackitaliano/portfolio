@@ -1,5 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { ReactNode, useRef, useEffect } from "react";
 
 type Dimensions = {
@@ -38,6 +39,7 @@ type Props = {
   onStateChange: (updater: WindowState | ((prev: WindowState) => WindowState)) => void;
   onClose?: () => void;
   onMinimize?: (windowRect: DOMRect) => void;
+  isVisible?: boolean;
   ctx?: WindowContext;
   onFocus?: () => void;
   requestFocusToken?: number;
@@ -55,7 +57,7 @@ export type WindowState = {
   isMaximized: boolean;
 }
 
-export function Window({ title, dimensions, position, index, state, onStateChange, onClose, onMinimize, ctx, onFocus, requestFocusToken, children }: Props) {
+export function Window({ title, dimensions, position, index, state, onStateChange, onClose, onMinimize, isVisible = true, ctx, onFocus, requestFocusToken, children }: Props) {
   const windowCtx: WindowContext = ctx ?? defaultWindowContext;
   const windowRef = useRef<HTMLDivElement>(null);
   const lastFocusTokenRef = useRef<number>(-1);
@@ -413,7 +415,10 @@ export function Window({ title, dimensions, position, index, state, onStateChang
   return (
       <div ref={windowRef}
       style={style}
-      className="absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[var(--wm-window-shadow)] text-slate-200"
+      className={cn(
+        "absolute flex flex-col border border-[#444547] rounded-lg overflow-hidden shadow-[var(--wm-window-shadow)] text-slate-200",
+        !isVisible && "hidden"
+      )}
       onMouseDown={handleWindowMouseDown}
     >
       <div className="select-none w-full h-[var(--wm-titlebar-h)] bg-[#353738] border-b border-[#444547] flex items-center">
