@@ -9,6 +9,7 @@ export type AppDrawerItem = {
   icon: ReactNode;
   isActive?: boolean;
   onClick?: () => void;
+  buttonRef?: (element: HTMLButtonElement | null) => void;
 };
 
 type Props = {
@@ -23,6 +24,7 @@ export function AppDrawer({ apps, className }: Props) {
         {apps.map((app) => (
           <button
             key={app.id}
+            ref={app.buttonRef}
             type="button"
             onClick={app.onClick}
             aria-label={app.title}

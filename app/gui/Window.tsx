@@ -37,6 +37,7 @@ type Props = {
   state: WindowState;
   onStateChange: (updater: WindowState | ((prev: WindowState) => WindowState)) => void;
   onClose?: () => void;
+  onMinimize?: (windowRect: DOMRect) => void;
   ctx?: WindowContext;
   onFocus?: () => void;
   requestFocusToken?: number;
@@ -54,7 +55,7 @@ export type WindowState = {
   isMaximized: boolean;
 }
 
-export function Window({ title, dimensions, position, index, state, onStateChange, onClose, ctx, onFocus, requestFocusToken, children }: Props) {
+export function Window({ title, dimensions, position, index, state, onStateChange, onClose, onMinimize, ctx, onFocus, requestFocusToken, children }: Props) {
   const windowCtx: WindowContext = ctx ?? defaultWindowContext;
   const windowRef = useRef<HTMLDivElement>(null);
   const lastFocusTokenRef = useRef<number>(-1);
@@ -386,6 +387,15 @@ export function Window({ title, dimensions, position, index, state, onStateChang
     onClose?.();
   }
 
+  function handleMinimizeClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation();
+    if (!windowRef.current) {
+      return;
+    }
+
+    onMinimize?.(windowRef.current.getBoundingClientRect());
+  }
+
   useEffect(() => {
     if (typeof requestFocusToken !== "number") {
       return;
@@ -414,7 +424,13 @@ export function Window({ title, dimensions, position, index, state, onStateChang
           aria-label={`Close ${title}`}
           title={`Close ${title}`}
         ></button>
-        <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#ffc500] mx-[var(--wm-traffic-gap)]"></button>
+        <button
+          className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#ffc500] mx-[var(--wm-traffic-gap)]"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={handleMinimizeClick}
+          aria-label={`Minimize ${title}`}
+          title={`Minimize ${title}`}
+        ></button>
         <button className="w-[var(--wm-traffic-size)] h-[var(--wm-traffic-size)] min-w-[var(--wm-traffic-size)] min-h-[var(--wm-traffic-size)] rounded-full shrink-0 bg-[#00c41e] mx-[var(--wm-traffic-gap)]" onMouseUp={toggleWindowSize}></button>
         <div className="z-10 w-full h-full cursor-grab active:cursor-grabbing" onMouseDown={(e: React.MouseEvent) => enableMoving(e.nativeEvent)}
           onTouchStart={(e: React.TouchEvent) => onTouchStart(e.nativeEvent, enableMoving)}>

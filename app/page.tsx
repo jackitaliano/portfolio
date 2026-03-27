@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import { BackgroundImage } from './components';
 import { Terminal, Notes, Image } from './apps';
 import { AppDrawer, Window, WindowManager } from './gui';
@@ -22,6 +22,22 @@ type AppWindow = {
   index: number;
   content: ReactNode;
 };
+
+type BoxRect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+type MinimizeAnimation = {
+  appId: string;
+  from: BoxRect;
+  to: BoxRect;
+  active: boolean;
+};
+
+const MINIMIZE_ANIMATION_MS = 260;
 
 function buildInitialWindowState(appWindow: AppWindow): WindowState {
   return {
@@ -95,6 +111,9 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
   const [windowOpenState, setWindowOpenState] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(appWindows.map((appWindow) => [appWindow.id, true]))
   );
+  const [minimizeAnimation, setMinimizeAnimation] = useState<MinimizeAnimation | null>(null);
+  const dockIconRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const minimizeTimeoutRef = useRef<number | null>(null);
 
   function updateWindowState(appWindow: AppWindow, updater: WindowState | ((prev: WindowState) => WindowState)) {
     setWindowStates((prevStates) => {
@@ -112,6 +131,19 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
     setFocusedAppId(appId);
     setRequestedFocusId(appId);
     setFocusToken((currentToken) => currentToken + 1);
+  }
+
+  function toBoxRect(rect: DOMRect): BoxRect {
+    return {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  function setDockIconRef(appId: string, element: HTMLButtonElement | null) {
+    dockIconRefs.current[appId] = element;
   }
 
   function closeApp(appId: string) {
@@ -138,6 +170,40 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
     focusApp(appWindow.id);
   }
 
+  function minimizeApp(appWindow: AppWindow, windowRect: DOMRect) {
+    closeApp(appWindow.id);
+
+    const targetElement = dockIconRefs.current[appWindow.id];
+    if (!targetElement) {
+      return;
+    }
+
+    const targetRect = targetElement.getBoundingClientRect();
+    const from = toBoxRect(windowRect);
+    const to = toBoxRect(targetRect);
+
+    setMinimizeAnimation({ appId: appWindow.id, from, to, active: false });
+
+    requestAnimationFrame(() => {
+      setMinimizeAnimation((prev) => {
+        if (!prev || prev.appId !== appWindow.id) {
+          return prev;
+        }
+
+        return { ...prev, active: true };
+      });
+    });
+
+    if (minimizeTimeoutRef.current !== null) {
+      window.clearTimeout(minimizeTimeoutRef.current);
+    }
+
+    minimizeTimeoutRef.current = window.setTimeout(() => {
+      setMinimizeAnimation((prev) => (prev?.appId === appWindow.id ? null : prev));
+      minimizeTimeoutRef.current = null;
+    }, MINIMIZE_ANIMATION_MS + 30);
+  }
+
   return (
     <main className="w-[100dvw] h-[100dvh] overflow-hidden">
       <BackgroundImage />
@@ -160,6 +226,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
               state={windowState}
               onStateChange={(updater) => updateWindowState(appWindow, updater)}
               onClose={() => closeApp(appWindow.id)}
+              onMinimize={(windowRect) => minimizeApp(appWindow, windowRect)}
               onFocus={() => setFocusedAppId(appWindow.id)}
               requestFocusToken={requestedFocusId === appWindow.id ? focusToken : undefined}
             >
@@ -174,6 +241,7 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
           title: appWindow.title,
           isActive: (windowOpenState[appWindow.id] ?? true) && focusedAppId === appWindow.id,
           onClick: () => openOrFocusApp(appWindow),
+          buttonRef: (element) => setDockIconRef(appWindow.id, element),
           icon: (
             <span className="flex h-7 w-7 items-center justify-center rounded-md border border-white/20 bg-zinc-800/60 text-sm font-semibold text-slate-100">
               {appWindow.title.charAt(0)}
@@ -181,6 +249,20 @@ The windows are fully functional, and the terminal has a "shell" behind it. Try 
           ),
         }))}
       />
+      {minimizeAnimation ? (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed z-[9998] rounded-lg border border-white/25 bg-slate-900/45 backdrop-blur-[2px]"
+          style={{
+            top: `${(minimizeAnimation.active ? minimizeAnimation.to : minimizeAnimation.from).top}px`,
+            left: `${(minimizeAnimation.active ? minimizeAnimation.to : minimizeAnimation.from).left}px`,
+            width: `${(minimizeAnimation.active ? minimizeAnimation.to : minimizeAnimation.from).width}px`,
+            height: `${(minimizeAnimation.active ? minimizeAnimation.to : minimizeAnimation.from).height}px`,
+            transition: `all ${MINIMIZE_ANIMATION_MS}ms cubic-bezier(0.22, 0.61, 0.36, 1)`,
+            boxShadow: '0 10px 24px rgba(0, 0, 0, 0.35)',
+          }}
+        />
+      ) : null}
     </main>
   );
 }
